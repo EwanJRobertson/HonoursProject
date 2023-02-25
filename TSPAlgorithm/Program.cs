@@ -31,14 +31,21 @@ namespace TSPAlgorithm
             }
             */
 
-            double[][] edgeLengths = new double[3][];
-            edgeLengths[0] = new double[3] { 0.0, 1.0, 2.0 };
-            edgeLengths[1] = new double[3] { 1.0, 0.0, 5.0 };
-            edgeLengths[2] = new double[3] { 2.0, 5.0, 0.0 };
-            Comparer<double> comparer = Comparer<double>.Default;
-            Array.Sort<double[]>(edgeLengths, (x,y) => comparer.Compare(x[1], y[1]));
-            for(int i=0; i<3; i++)
-                Console.WriteLine(edgeLengths[i][0]);
+            string[] input = fileIO.Read("C:\\Users\\nuker\\Documents\\Honours Project\\TSPAlgorithm\\TSPAlgorithm\\Problems\\berlin52.tsp");
+            string probName = input[0];
+            string comment = input[1];
+            int dimension = 52;
+            string edgeWeightType = input[3];
+            (int, int)[] nodes = new (int, int)[input.Length - 5];
+            string[] a;
+            for (int i = 6; i < 58; i++)
+            {
+                a = input[i].Split(' ');
+                nodes[i - 4] = ((int)double.Parse(a[1]), (int)double.Parse(a[2]));
+            }
+            Problem p = ProblemFactory.FactoryMethod(probName, comment, dimension, edgeWeightType, nodes);
+
+            NearestNeighbour n = new NearestNeighbour();
 
             // END
             Console.WriteLine("Exiting");

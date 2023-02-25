@@ -1,42 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+﻿/*
+ * Author: Ewan Robertson
+ * Nearest Neighnour algorithm for solving Travelling Salesman Problems.
+ */
 
 namespace TSPAlgorithm
 {
     internal class NearestNeighbour : TravellingSalesmanAlgorithm
     {
+        /// <summary>
+        /// Algorithm name.
+        /// </summary>
         private string _name = "NearestNeighbour";
-        private int _evalBudget = 0;
+
         public NearestNeighbour()
-        {
-        }
+        {  }
 
         public Result Run(Problem problem)
         {
-            List<int> nodes = new List<int>();
+            Permutation permutation = new Permutation(ref problem);
             Random rand = new Random();
-            nodes.Add(rand.Next(0, problem.Nodes.Length));
-            // order nodes by distance from nodes.head, pick closest node that is not in nodes
-            double[][] edgeLengths = problem.EdgeLengths;
 
-            for (int i=0; i<problem.Nodes.Length-1; i++)
+            // first node random
+            permutation.Add(rand.Next(0, problem.Dimension));
+            // order nodes by distance from nodes.head, pick closest node that is not in nodes
+
+            for (int i = 0; i < problem.Dimension - 1; i++)
             {
+                
                 int nearestNeighbourIndex = 0;
-                for (int j=0; j<problem.Nodes.Length; j++)
+                while (permutation.Contains(nearestNeighbourIndex))
                 {
-                    if (!nodes.Contains(j) && edgeLengths[nodes.Last()][j] < edgeLengths[nodes.Last()][nearestNeighbourIndex])
+                    nearestNeighbourIndex++;
+                }
+
+                for (int j = 0; j < problem.Dimension; j++)
+                {
+                    if (!permutation.Contains(j) && 
+                        problem.EdgeLengths[permutation.Last()][j] < problem.EdgeLengths[permutation.Last()][nearestNeighbourIndex])
                     {
                         nearestNeighbourIndex = j;
                     }
                 }
-                nodes.Add(nearestNeighbourIndex);
+                permutation.Add(nearestNeighbourIndex);
             }
-            return null;
+            
+            return ResultFactory.FactoryMethod(problem.Name, _name, permutation.Fitness, permutation.Path(), 1);
         }
     }
 }

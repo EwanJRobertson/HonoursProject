@@ -19,6 +19,10 @@ namespace TSPAlgorithm
         /// Fitness (tour distance) of the best solution found.
         /// </summary>
         private double _bestFitness;
+        public double BestFitness
+        {
+            get { return _bestFitness; }
+        }
         /// <summary>
         /// Path (node order) of the best solution found.
         /// </summary>

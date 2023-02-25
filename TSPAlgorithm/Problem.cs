@@ -14,6 +14,12 @@ namespace TSPAlgorithm
         /// Name of the problem.
         /// </summary>
         private string _name;
+
+        public string Name
+        {
+            get { return _name; }
+        }
+
         /// <summary>
         /// Comment from file.
         /// </summary>
@@ -22,6 +28,11 @@ namespace TSPAlgorithm
         /// Number of nodes in the problem.
         /// </summary>
         private int _dimension;
+
+        public int Dimension
+        {
+            get { return _dimension; }
+        }
         /// <summary>
         /// Edge weight type from file.
         /// </summary>
@@ -60,12 +71,15 @@ namespace TSPAlgorithm
             _edgeWeightType = edgeWeightType;
             _nodes = nodes;
 
-            double[][] _edgeLengths = new double[nodes.Length][];
+            _edgeLengths = new double[nodes.Length][];
             for(int i=0; i<_nodes.Length; i++)
             {
                 _edgeLengths[i] = new double[_nodes.Length];
                 for (int j = 0; j < _nodes.Length; j++)
-                    _edgeLengths[i][j] = Math.Sqrt((_nodes[j].Item1 - _nodes[i].Item1) ^ 2 + (_nodes[j].Item2 - _nodes[i].Item2) ^ 2);
+                {
+                    _edgeLengths[i][j] = Math.Sqrt((_nodes[j].Item1 - _nodes[i].Item1) * (_nodes[j].Item1 - _nodes[i].Item1) +
+                        (_nodes[j].Item2 - _nodes[i].Item2) * (_nodes[j].Item2 - _nodes[i].Item2));
+                }
             }
         }
 
