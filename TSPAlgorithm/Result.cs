@@ -27,6 +27,11 @@ namespace TSPAlgorithm
         /// Path (node order) of the best solution found.
         /// </summary>
         private string _bestPath;
+        public string BestPath
+        {
+            get { return _bestPath; }
+        }
+
         /// <summary>
         /// Number of evaluations allowed in the execution.
         /// </summary>

@@ -77,8 +77,8 @@ namespace TSPAlgorithm
                 _edgeLengths[i] = new double[_nodes.Length];
                 for (int j = 0; j < _nodes.Length; j++)
                 {
-                    _edgeLengths[i][j] = Math.Sqrt((_nodes[j].Item1 - _nodes[i].Item1) * (_nodes[j].Item1 - _nodes[i].Item1) +
-                        (_nodes[j].Item2 - _nodes[i].Item2) * (_nodes[j].Item2 - _nodes[i].Item2));
+                    _edgeLengths[i][j] = Math.Sqrt(Math.Pow(_nodes[j].Item1 - _nodes[i].Item1, 2) +
+                        Math.Pow(_nodes[j].Item2 - _nodes[i].Item2, 2));
                 }
             }
         }

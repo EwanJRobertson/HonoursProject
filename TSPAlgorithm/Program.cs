@@ -45,7 +45,9 @@ namespace TSPAlgorithm
             }
             Problem p = ProblemFactory.FactoryMethod(probName, comment, dimension, edgeWeightType, nodes);
 
-            NearestNeighbour n = new NearestNeighbour();
+            // NearestNeighbour n = new NearestNeighbour();
+            ACO n = new ACO();
+            Console.WriteLine(n.Run(p).BestFitness);
 
             // END
             Console.WriteLine("Exiting");

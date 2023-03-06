@@ -39,7 +39,7 @@ namespace TSPAlgorithm
         /// Constructor.
         /// </summary>
         /// <param name="problem">Reference to the problem the permuation is an answer to.</param>
-        public Permutation(ref Problem problem)
+        public Permutation(Problem problem)
         {
             _nodes = new List<int>();
             _problem = problem;
@@ -67,6 +67,8 @@ namespace TSPAlgorithm
         /// the same node.</returns>
         private void FitnessFunction()
         {
+            if (Length == 0)
+                return;
             _fitness = 0;
             for (int i = 0; i < Nodes.Count - 1; i++)
             {
@@ -88,9 +90,9 @@ namespace TSPAlgorithm
             }
         }
 
-        public int Length()
+        public int Length
         {
-            return _nodes.Count;
+            get { return _nodes.Count; }
         }
 
         public bool Contains(int search)
@@ -98,9 +100,9 @@ namespace TSPAlgorithm
             return _nodes.Contains(search);
         }
 
-        public int Last()
+        public int Last
         {
-            return _nodes.Last();
+            get { return _nodes.Last(); }
         }
 
         public string Path()

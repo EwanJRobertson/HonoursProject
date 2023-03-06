@@ -17,7 +17,7 @@ namespace TSPAlgorithm
 
         public Result Run(Problem problem)
         {
-            Permutation permutation = new Permutation(ref problem);
+            Permutation permutation = new Permutation(problem);
             Random rand = new Random();
 
             // first node random
@@ -36,7 +36,7 @@ namespace TSPAlgorithm
                 for (int j = 0; j < problem.Dimension; j++)
                 {
                     if (!permutation.Contains(j) && 
-                        problem.EdgeLengths[permutation.Last()][j] < problem.EdgeLengths[permutation.Last()][nearestNeighbourIndex])
+                        problem.EdgeLengths[permutation.Last][j] < problem.EdgeLengths[permutation.Last][nearestNeighbourIndex])
                     {
                         nearestNeighbourIndex = j;
                     }
