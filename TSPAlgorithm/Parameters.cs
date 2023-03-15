@@ -1,23 +1,36 @@
 ﻿/*
  * Author: Ewan Robertson
- * Parameters.
+ * Universal parameters, i.e. parameters that do not change regardless of
+ * the algorithm being run.
  */
 
 namespace TSPAlgorithm
 {
-    internal class Parameters
+    internal static class Parameters
     {
-        public readonly int EvaluationBudget = 0;
+        /// <summary>
+        /// File path to work space.
+        /// </summary>
+        public const string FilePath = "C:\\Users\\nuker\\Documents\\Honours Project\\Problems\\";
 
-        // EA
-        public readonly int PopulationSize = 0;
-        public readonly double MutationRate = 0;
-        public readonly double CrossoverRate = 0;
-        public readonly int TournamentSize = 0;
+        /// <summary>
+        /// TSPLIB file name.
+        /// </summary>
+        public const string ProblemName = "berlin52.tsp";
 
-        public Parameters()
-        {
+        /// <summary>
+        /// The number of times the algorithm will be executed on the problem instance.
+        /// </summary>
+        public const int NumberOfRuns = 1;
 
-        }
+        /// <summary>
+        /// Maximum number of evaluations (fitness function calls) allowed.
+        /// </summary>
+        public const int EvaluationBudget = 50000;
+
+        /// <summary>
+        /// Instance of Random class.
+        /// </summary>
+        public static Random random = new Random();
     }
 }

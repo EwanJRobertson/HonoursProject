@@ -4,50 +4,34 @@ namespace TSPAlgorithm
 {
     internal class Program
     {
-        private static string _outputFile = "";
         static void Main(string[] args)
         {
             // setup
-            FileIO fileIO = FileIO.Instance;
             ProblemFactory problemFactory = ProblemFactory.Instance;
-            ResultFactory resultFactory = ResultFactory.Instance;
             List<Problem> problems = new List<Problem>();
 
             Console.WriteLine("Honours Project: TITLE");
             Console.WriteLine("Author: Ewan Robertson 40451077");
             Console.WriteLine("Framework for the comparison of algorithms for solving " +
                 "benchmark Travelling Salesman Problems.\n");
-            Console.WriteLine($"Output writing to {_outputFile}.");
+            // Console.WriteLine($"Output writing to {_outputFile}.");
 
-            /*
-            while (true)
+            // problem file
+            string[] input = FileIO.Read(Parameters.FilePath + Parameters.ProblemName);
+            Problem problem = Problem.ParseTSP(input);
+
+            Result[] results = new Result[Parameters.NumberOfRuns];
+
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
             {
-                int choice = 0;
-                // get user choice
-                if (choice == 0)
-                    break;
-                // execute algorithm
-                // save results
+                // NearestNeighbour algorithm = new NearestNeighbour("nn", problem);
+                EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("ea", problem);
+                // AntColonyOptimisation algorithm = new AntColonyOptimisation("aco", problem);
+                // SimulatedAnnealing algorithm = new SimulatedAnnealing("sa", problem);
+                results[i] = algorithm.Run();
             }
-            */
 
-            string[] input = fileIO.Read("C:\\Users\\nuker\\Documents\\Honours Project\\TSPAlgorithm\\TSPAlgorithm\\Problems\\berlin52.tsp");
-            string probName = input[0];
-            string comment = input[1];
-            int dimension = 52;
-            string edgeWeightType = input[3];
-            (int, int)[] nodes = new (int, int)[input.Length - 5];
-            string[] a;
-            for (int i = 6; i < 58; i++)
-            {
-                a = input[i].Split(' ');
-                nodes[i - 4] = ((int)double.Parse(a[1]), (int)double.Parse(a[2]));
-            }
-            Problem p = ProblemFactory.FactoryMethod(probName, comment, dimension, edgeWeightType, nodes);
-
-            // NearestNeighbour n = new NearestNeighbour();
-            ACO n = new ACO();
-            Console.WriteLine(n.Run(p).BestFitness);
+            FileIO.Write(Parameters.FilePath + "result.csv", Result.ToOutput(results));
 
             // END
             Console.WriteLine("Exiting");

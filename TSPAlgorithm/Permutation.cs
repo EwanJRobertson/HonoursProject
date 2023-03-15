@@ -15,14 +15,6 @@ namespace TSPAlgorithm
         private List<int> _nodes;
 
         /// <summary>
-        /// Getter for permutation nodes.
-        /// </summary>
-        public List<int> Nodes
-        {
-            get { return _nodes; }
-        }
-
-        /// <summary>
         /// A reference to the problem which the permutation is an answer to.
         /// </summary>
         private Problem _problem;
@@ -43,7 +35,7 @@ namespace TSPAlgorithm
         {
             _nodes = new List<int>();
             _problem = problem;
-            _fitness = -1;
+            _fitness = int.MaxValue;
         }
 
         /// <summary>
@@ -55,8 +47,10 @@ namespace TSPAlgorithm
         /// Get Fitness.
         /// </summary>
         public double Fitness
-        { 
-            get { if (_fitness < 0) { FitnessFunction(); } return _fitness; }
+        {
+            get { if (_fitness == int.MaxValue) { FitnessFunction(); } return _fitness; }
+            // get { FitnessFunction(); return _fitness; }
+            set { _fitness = value; }
         }
 
         /// <summary>
@@ -65,16 +59,20 @@ namespace TSPAlgorithm
         /// </summary>
         /// <returns>The distnace around the nodes, starting and finishing at 
         /// the same node.</returns>
-        private void FitnessFunction()
+        public void FitnessFunction()
         {
-            if (Length == 0)
-                return;
-            _fitness = 0;
-            for (int i = 0; i < Nodes.Count - 1; i++)
+            if (Length != Problem.Dimension || Length != _nodes.Distinct().Count())
             {
-                _fitness += _problem.EdgeLengths[Nodes[i]][Nodes[i + 1]];
+                _fitness = int.MaxValue;
+                return;
+            }    
+
+            _fitness = 0;
+            for (int i = 0; i < Length - 1; i++)
+            {
+                _fitness += _problem.EdgeLengths[_nodes[i]][_nodes[i + 1]];
             }
-            _fitness += _problem.EdgeLengths[Nodes[Nodes.Count - 1]][Nodes[0]];
+            _fitness += _problem.EdgeLengths[_nodes[Length - 1]][_nodes[0]];
             _fitness = Math.Round(_fitness);
         }
 
@@ -88,6 +86,17 @@ namespace TSPAlgorithm
             {
                 _nodes.Add(next);
             }
+        }
+
+        public int GetNode(int index)
+        {
+            return _nodes[index];
+        }
+
+        public void SetNode(int index, int value)
+        {
+            _nodes[index] = value;
+            _fitness = int.MaxValue;
         }
 
         public int Length
@@ -113,6 +122,18 @@ namespace TSPAlgorithm
                 returnStr += ($"{i},");
             }
             return returnStr.Substring(0, returnStr.Length - 1);
+        }
+
+        public Permutation Clone()
+        {
+            Permutation clone = new Permutation(Problem);
+            foreach (int i in _nodes)
+            {
+                clone.Add(i);
+            }
+            clone.Fitness = _fitness;
+
+            return clone;
         }
     }
 }

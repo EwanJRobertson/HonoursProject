@@ -7,61 +7,37 @@ namespace TSPAlgorithm
 {
     internal class NearestNeighbour : TravellingSalesmanAlgorithm
     {
-        /// <summary>
-        /// Algorithm name.
-        /// </summary>
-        private string _name = "NearestNeighbour";
+        public NearestNeighbour(string name, Problem problem) : base (name, problem)
+        { }
 
-        public NearestNeighbour()
-        {  }
-
-        public Result Run(Problem problem)
+        public override Result Run()
         {
-            Permutation permutation = new Permutation(problem);
-            Random rand = new Random();
-
+            Best = new Permutation(Problem);
             // first node random
-            permutation.Add(rand.Next(0, problem.Dimension));
+            Best.Add(Parameters.random.Next(0, Problem.Dimension));
             // order nodes by distance from nodes.head, pick closest node that is not in nodes
 
-            for (int i = 0; i < problem.Dimension - 1; i++)
+            for (int i = 0; i < Problem.Dimension - 1; i++)
             {
-                
                 int nearestNeighbourIndex = 0;
-                while (permutation.Contains(nearestNeighbourIndex))
+                while (Best.Contains(nearestNeighbourIndex))
                 {
                     nearestNeighbourIndex++;
                 }
 
-                for (int j = 0; j < problem.Dimension; j++)
+                for (int j = 0; j < Problem.Dimension; j++)
                 {
-                    if (!permutation.Contains(j) && 
-                        problem.EdgeLengths[permutation.Last][j] < problem.EdgeLengths[permutation.Last][nearestNeighbourIndex])
+                    if (!Best.Contains(j) && 
+                        Problem.EdgeLengths[Best.Last][j] < Problem.EdgeLengths[Best.Last][nearestNeighbourIndex])
                     {
                         nearestNeighbourIndex = j;
                     }
                 }
-                permutation.Add(nearestNeighbourIndex);
+                Best.Add(nearestNeighbourIndex);
             }
-            
-            return ResultFactory.FactoryMethod(problem.Name, _name, permutation.Fitness, permutation.Path(), 1);
+
+            Evaluations++;
+            return Result();
         }
     }
 }
-
-
-/*
-                Comparer<double> comparer = Comparer<double>.Default;
-                Array.Sort<double[]>(edgeLengths, (x,y) => comparer.Compare(x[column], y[column]));
-                int currentNode = nodes.Last();
-                Array.Sort<double[]>(edgeLengths, (x, y) => comparer.Compare(x[currentNode-1], y[currentNode-1]));
-                int count = 0;
-                edgeLengths.
-                while (nodes.Contains(edgeLengths[currentNode - 1][count]))
-                {
-
-                }
-                */
-
-// find min in column not already used
-// edge[current][i] min

@@ -7,28 +7,8 @@
 
 namespace TSPAlgorithm
 {
-    internal class ResultFactory
+    internal static class ResultFactory
     {
-        /// <summary>
-        /// Contains a reference to the single instance of the ResultFactory class.
-        /// </summary>
-        private static ResultFactory? _instance;
-
-        /// <summary>
-        /// Gets a reference to the instance, creates a new instance if none exists.
-        /// </summary>
-        /// <returns>
-        /// A reference to the ResultFactory.
-        /// </returns>
-        public static ResultFactory Instance
-        {
-            get
-            {
-                if (_instance == null) _instance = new ResultFactory();
-                return _instance;
-            }
-        }
-
         /// <summary>
         /// Factory method for creating Result objects containing the details of a single 
         /// execution of an algorithm on a benchmark travelling salesman problem.
