@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Xml.Serialization;
 
 namespace TSPAlgorithm
 {
@@ -7,7 +8,6 @@ namespace TSPAlgorithm
         static void Main(string[] args)
         {
             // setup
-            ProblemFactory problemFactory = ProblemFactory.Instance;
             List<Problem> problems = new List<Problem>();
 
             Console.WriteLine("Honours Project: TITLE");
