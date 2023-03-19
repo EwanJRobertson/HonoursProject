@@ -4,6 +4,8 @@
  * Travelling Salesman Problems (TSP).
  */
 
+using System.Runtime.InteropServices;
+
 namespace TSPAlgorithm
 {
     /// <summary>
@@ -25,31 +27,49 @@ namespace TSPAlgorithm
         /// Probability to move from current node to node numbered index.
         /// </summary>
         private double[] _probabilities;
-        
+
         /// <summary>
         /// Size of the population.
         /// </summary>
-        private readonly int _populationSize = 100;
+        private int _populationSize = 100;
+
+        public int PopulationSize
+        {
+            get { return _populationSize; }
+            set { _populationSize = value; }
+        }
 
         /// <summary>
         /// Chance for a random move (not affected by pheromones). 0-1.
         /// </summary>
-        private readonly double _mutationRate = 0.01;
+        private double _mutationRate = 0.01;
 
         /// <summary>
         /// Factor to multiple pheromones by after entire population has moved. 0-1.
         /// </summary>
-        private readonly double _evaporationFactor = 0.5;
+        private double _evaporationFactor = 0.5;
+
+        public double EvaporationFactor
+        {
+            get { return _evaporationFactor; }
+            set { _evaporationFactor = value; }
+        }
 
         /// <summary>
         /// Pheromone importance factor.
         /// </summary>
-        private readonly int alpha = 1;
-        
+        private int alpha = 1;
+
         /// <summary>
         /// Distance importance factor.
         /// </summary>
-        private readonly int beta = 8;
+        private int beta = 8;
+
+        public int Beta
+        {
+            get { return beta; }
+            set { beta = value; }
+        }
 
         /// <summary>
         /// Starting pheromone values.
@@ -59,7 +79,13 @@ namespace TSPAlgorithm
         /// <summary>
         /// Total number of pheromones left by each ant.
         /// </summary>
-        private readonly int q = 500;
+        private int q = 500;
+
+        public int Q
+        {
+            get { return q; }
+            set { q = value; }
+        }
 
         /// <summary>
         /// Constructor.
@@ -78,6 +104,7 @@ namespace TSPAlgorithm
         /// </summary>
         private void Init()
         {
+            _population = new Permutation[_populationSize];
             _probabilities = new double[Problem.Dimension];
 
             // set all pheromones to initial value c
@@ -196,6 +223,9 @@ namespace TSPAlgorithm
         /// <returns>Result object containing information on the run.</returns>
         public override Result Run()
         {
+            // print best each generation
+            string[] bests = new string[Parameters.EvaluationBudget / _populationSize];
+
             // save best result found
             Best = new Permutation(Problem);
 
@@ -203,12 +233,12 @@ namespace TSPAlgorithm
             Init();
 
             // main loop
-            for (int Evaluations = 0; Evaluations < Parameters.EvaluationBudget; Evaluations += _populationSize)
+            for (Evaluations = 0; Evaluations < Parameters.EvaluationBudget; Evaluations += _populationSize)
             {
                 // move each ant around a tour
-                for (int j = 0; j < _populationSize; j++)
+                for (int i = 0; i < _populationSize; i++)
                 {
-                    _population[j] = Move();
+                    _population[i] = Move();
                 }
 
                 // order population by fitness
@@ -224,7 +254,12 @@ namespace TSPAlgorithm
                 UpdatePheromones();
 
                 // write best solution to console
-                Console.WriteLine($"{Evaluations + 1} {Best.Fitness}");
+                Console.WriteLine($"{Evaluations} {Best.Fitness}");
+                bests[Evaluations] = Best.Fitness.ToString();
+            }
+            if (Parameters.WriteAllBests)
+            {
+                FileIO.Write(Parameters.FilePath + "ACOEvals" + DateTime.Now + ".csv", bests);
             }
 
             // return result

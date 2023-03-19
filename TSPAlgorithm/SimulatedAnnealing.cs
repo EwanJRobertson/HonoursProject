@@ -4,7 +4,7 @@
     {
         private readonly double _initialTemperature = 2000;
 
-        private readonly double _coolingRate = 0.005;
+        private readonly double _coolingRate = 0.1;
 
         public SimulatedAnnealing(string name, Problem problem) : base(name, problem)
         { }
@@ -56,6 +56,30 @@
             return cycle;
         }
 
+        public Permutation HPRM(Permutation child)
+        {
+            int sequenceStart = Parameters.random.Next(Problem.Dimension - 1);
+            int sequenceEnd = Parameters.random.Next(sequenceStart, Problem.Dimension);
+
+            while (sequenceStart < sequenceEnd)
+            {
+                int temp = child.GetNode(sequenceEnd);
+                child.SetNode(sequenceEnd, child.GetNode(sequenceStart));
+                child.SetNode(sequenceStart, temp);
+                if (Parameters.random.NextDouble() < 0.01)
+                {
+                    int pos = Parameters.random.Next(Problem.Dimension);
+                    temp = child.GetNode(pos);
+                    child.SetNode(pos, child.GetNode(sequenceStart));
+                    child.SetNode(sequenceStart, temp);
+                }
+                sequenceStart++;
+                sequenceEnd--;
+            }
+
+            return child;
+        }
+
         public override Result Run()
         {
             Permutation workingCycle = NewRandomCycle();
@@ -64,13 +88,15 @@
 
             double currentTemperature = _initialTemperature;
 
+            // for (Evaluations = 0; Evaluations < Parameters.EvaluationBudget; Evaluations++)
             for (Evaluations = 0; Evaluations < Parameters.EvaluationBudget; Evaluations++)
             {
-                workingCycle = ReverseSequenceMutation(workingCycle);
-                workingCycle.FitnessFunction();
+                workingCycle = HPRM(localBestCycle.Clone());
 
-                if ((workingCycle.Fitness < localBestCycle.Fitness) ||
-                        (Parameters.random.NextDouble() > Math.Exp(-(localBestCycle.Fitness - workingCycle.Fitness) / currentTemperature)))
+                if ((workingCycle.Fitness <= localBestCycle.Fitness) ||
+                        (Parameters.random.NextDouble() <= Math.Exp(
+                            -(double)(workingCycle.Fitness - localBestCycle.Fitness) 
+                            / (double)currentTemperature)))
                 {
                     localBestCycle = workingCycle.Clone();
                 }
@@ -81,7 +107,7 @@
                 }
 
                 currentTemperature *= _coolingRate;
-                Console.WriteLine($"{Evaluations + 1} {Best.Fitness}");
+                Console.WriteLine($"{Evaluations + 1} {workingCycle.Fitness}");
             }
 
             return Result();

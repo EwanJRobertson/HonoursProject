@@ -16,7 +16,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// TSPLIB file name.
         /// </summary>
-        public const string ProblemName = "berlin52.tsp";
+        public const string ProblemName = "ulysses16.tsp";
 
         /// <summary>
         /// The number of times the algorithm will be executed on the problem instance.
@@ -32,5 +32,7 @@ namespace TSPAlgorithm
         /// Instance of Random class.
         /// </summary>
         public static Random random = new Random();
+
+        public static bool WriteAllBests = false;
     }
 }

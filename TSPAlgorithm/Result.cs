@@ -37,6 +37,11 @@ namespace TSPAlgorithm
         /// </summary>
         private int _evaluationBudget;
 
+        public int EvaluationBudget
+        {
+            get { return _evaluationBudget; }
+        }
+
         /// <summary>
         /// Constructor for initialising Result instances.
         /// </summary>

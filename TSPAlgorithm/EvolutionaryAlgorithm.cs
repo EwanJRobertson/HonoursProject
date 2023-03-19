@@ -4,6 +4,8 @@
  * Salesman Problems (TSP).
  */
 
+using System.Globalization;
+
 namespace TSPAlgorithm
 {
     /// <summary>
@@ -21,6 +23,12 @@ namespace TSPAlgorithm
         /// </summary>
         private int _populationSize = 40;
 
+        public int PopulationSize
+        {
+            get { return _populationSize; }
+            set { _populationSize = value; }
+        }
+
         /// <summary>
         /// Tournament selection, tournament size.
         /// </summary>
@@ -28,11 +36,23 @@ namespace TSPAlgorithm
 
         private double _crossoverRate = 1;
 
+        public double CrossoverRate
+        {
+            get { return _crossoverRate; }
+            set { _crossoverRate = value; }
+        }
+
         /// <summary>
         /// Chance for the mutation function to be applied to a child 
         /// permutation. 0-1.
         /// </summary>
         private double _mutationRate = 0.9;
+
+        public double MutationRate
+        {
+            get { return _mutationRate; }
+            set { _mutationRate = value; }
+        }
 
         /// <summary>
         /// Constructor.
@@ -50,6 +70,7 @@ namespace TSPAlgorithm
         /// </summary>
         public void InitPopulation()
         {
+            _population = new Permutation[_populationSize];
             for (int i = 0; i < _populationSize; i++)
             {
                 _population[i] = new Permutation(Problem);
@@ -240,6 +261,56 @@ namespace TSPAlgorithm
             return child;
         }
 
+        public Permutation PartialShuffleMutation(Permutation child)
+        {
+            if (Parameters.random.NextDouble() > _mutationRate)
+            {
+                return child;
+            }
+
+            for (int i = 0; i < Problem.Dimension; i++)
+            {
+                if (Parameters.random.NextDouble() < _mutationRate / Problem.Dimension )
+                {
+                    int j = Parameters.random.Next(Problem.Dimension);
+                    int temp = child.GetNode(j);
+                    child.SetNode(j, child.GetNode(i));
+                    child.SetNode(i, temp);
+                }
+            }
+
+            return child;
+        }
+
+        public Permutation HPRM(Permutation child)
+        {
+            if (Parameters.random.NextDouble() > _mutationRate)
+            {
+                return child;
+            }
+
+            int sequenceStart = Parameters.random.Next(Problem.Dimension - 1);
+            int sequenceEnd = Parameters.random.Next(sequenceStart, Problem.Dimension);
+
+            while (sequenceStart < sequenceEnd)
+            {
+                int temp = child.GetNode(sequenceEnd);
+                child.SetNode(sequenceEnd, child.GetNode(sequenceStart));
+                child.SetNode(sequenceStart, temp);
+                if (Parameters.random.NextDouble() < 0.01)
+                {
+                    int pos = Parameters.random.Next(Problem.Dimension);
+                    temp = child.GetNode(pos);
+                    child.SetNode(pos, child.GetNode(sequenceStart));
+                    child.SetNode(sequenceStart, temp);
+                }
+                sequenceStart++; 
+                sequenceEnd--;
+            }
+
+            return child;
+        }
+
         /// <summary>
         /// Replace the weakest member of the population if child fitness is lower.
         /// </summary>
@@ -258,6 +329,9 @@ namespace TSPAlgorithm
         /// </summary>
         public override Result Run()
         {
+            // print best each generation
+            string[] bests = new string[Parameters.EvaluationBudget];
+
             // initialise population
             InitPopulation();
             // initialise best
@@ -280,7 +354,9 @@ namespace TSPAlgorithm
 
                 // mutation
                 // child = Mutate(child);
-                child = ReverseSequenceMutation(child);
+                // child = ReverseSequenceMutation(child);
+                // child = PartialShuffleMutation(child);
+                child = HPRM(child);
 
                 // replacement
                 Replace(child);
@@ -293,7 +369,12 @@ namespace TSPAlgorithm
                 }
 
                 // write best solution to console
-                Console.WriteLine($"{Evaluations + 1} {Best.Fitness}");
+                Console.WriteLine($"{Evaluations + 1} {Best.Fitness}"); 
+                bests[Evaluations] = Best.Fitness.ToString();
+            }
+            if (Parameters.WriteAllBests)
+            {
+                FileIO.Write(Parameters.FilePath + "EAEvals" + DateTime.Now + ".csv", bests);
             }
 
             return Result();

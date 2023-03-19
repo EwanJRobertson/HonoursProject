@@ -4,6 +4,8 @@
  * Singleton Design Pattern
  */
 
+using System.Runtime.CompilerServices;
+
 namespace TSPAlgorithm
 {
     internal static class FileIO
@@ -28,7 +30,7 @@ namespace TSPAlgorithm
             File.WriteAllLines(filepath, lines);
         }
 
-        public static Problem ParseTSPLIB()
+        public static Problem ParseTSPLIB(string problem)
         {
             string problemName = "";
             string comment = "";
@@ -37,7 +39,7 @@ namespace TSPAlgorithm
             string edgeWeightFormat = "";
             double[][] edgeWeights = new double[0][];
 
-            string[] input = Read(Parameters.FilePath + Parameters.ProblemName);
+            string[] input = Read(Parameters.FilePath + problem + ".tsp");
             int count = 0;
             while (input[count].Trim() != "EOF")
             {
@@ -72,13 +74,14 @@ namespace TSPAlgorithm
 
                     case "NODE_COORD_SECTION":
                     case "EDGE_WEIGHT_SECTION":
+                        count++;
                         switch (edgeWeightType)
                         {
                             case "EXPLICIT":
                                 switch (edgeWeightFormat)
                                 {
                                     case "FULL_MATRIX":
-                                        edgeWeights = LowerDiagRow(input, count, dimension);
+                                        edgeWeights = FullMatrix(input, count, dimension);
                                         break;
 
                                     case "UPPER_ROW":
@@ -150,7 +153,7 @@ namespace TSPAlgorithm
                             default:
                                 break;
                         }
-                        count += dimension;
+                        count += dimension - 1;
                         break;
 
                     default:
@@ -263,8 +266,9 @@ namespace TSPAlgorithm
             {
                 for (int j = 0; j < dimension; j++)
                 {
-                    edgeWeights[i][j] = Math.Max((nodes[j].Item1 - nodes[i].Item1),
-                        (nodes[j].Item2 - nodes[i].Item2));
+                    edgeWeights[i][j] = Math.Round(Math.Max(
+                        nodes[j].Item1 - nodes[i].Item1,
+                        nodes[j].Item2 - nodes[i].Item2));
                 }
             }
 
@@ -286,7 +290,8 @@ namespace TSPAlgorithm
                 edgeWeights[i] = new double[dimension];
             }
 
-            (double, double, double)[] nodes = new (double, double, double)[dimension];
+            (double, double, double)[] nodes = new 
+                (double, double, double)[dimension];
             for (int i = 0; i < dimension; i++)
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
@@ -299,10 +304,10 @@ namespace TSPAlgorithm
             {
                 for (int j = 0; j < dimension; j++)
                 {
-                    edgeWeights[i][j] = Math.Max(Math.Max(
+                    edgeWeights[i][j] = Math.Round(Math.Max(Math.Max(
                         nodes[j].Item1 - nodes[i].Item1,
                         nodes[j].Item2 - nodes[i].Item2),
-                        nodes[j].Item3 - nodes[i].Item3);
+                        nodes[j].Item3 - nodes[i].Item3));
                 }
             }
 
@@ -336,8 +341,9 @@ namespace TSPAlgorithm
             {
                 for (int j = 0; j < dimension; j++)
                 {
-                    edgeWeights[i][j] = (nodes[j].Item1 - nodes[i].Item1) + 
-                        (nodes[j].Item2 - nodes[i].Item2);
+                    edgeWeights[i][j] = Math.Round(
+                        nodes[j].Item1 - nodes[i].Item1 + 
+                        nodes[j].Item2 - nodes[i].Item2);
                 }
             }
 
@@ -372,9 +378,10 @@ namespace TSPAlgorithm
             {
                 for (int j = 0; j < dimension; j++)
                 {
-                    edgeWeights[i][j] = (nodes[j].Item1 - nodes[i].Item1) +
-                        (nodes[j].Item2 - nodes[i].Item2) +
-                        (nodes[j].Item3 - nodes[i].Item3);
+                    edgeWeights[i][j] = Math.Round(
+                        nodes[j].Item1 - nodes[i].Item1 +
+                        nodes[j].Item2 - nodes[i].Item2 +
+                        nodes[j].Item3 - nodes[i].Item3);
                 }
             }
 
@@ -438,23 +445,59 @@ namespace TSPAlgorithm
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
                     input[index + i], @"\s+", " ").Trim().Split(' ');
                 double x = double.Parse(line[1]);
+                double degx = (int)x;
+                double minx = x - degx;
                 double y = double.Parse(line[2]);
+                double degy = (int)y;
+                double miny = y - degy;
                 nodes[i] = (Math.PI * 
-                    (x - Math.Round(x) + 5.0 * x - Math.Round(x) / 3.0) / 180,
+                    (degx + 5.0 * minx / 3.0) / 180.0,
                     Math.PI * 
-                    (y - Math.Round(y) + 5.0 * y - Math.Round(y) / 3.0) / 180);
+                    (degy + 5.0 * miny / 3.0) / 180.0);
             }
 
             for (int i = 0; i < dimension; i++)
             {
                 for (int j = 0; j < dimension; j++)
                 {
-                    double q1 = Math.Cos(nodes[j].Item2 - nodes[i].Item2);
-                    double q2 = Math.Cos(nodes[j].Item1 - nodes[i].Item1);
-                    double q3 = Math.Cos(nodes[j].Item1 + nodes[i].Item1);
-                    edgeWeights[i][j] = 6378.388 * Math.Acos(
-                        0.5 * ((1.0 + q1) * q2 - (1.0 - q1) * q3)) + 1.0;
+                    double q1 = Math.Cos(nodes[i].Item2 - nodes[j].Item2);
+                    double q2 = Math.Cos(nodes[i].Item1 - nodes[j].Item1);
+                    double q3 = Math.Cos(nodes[i].Item1 + nodes[j].Item1);
+                    edgeWeights[i][j] = (int)(6378.388 * Math.Acos(
+                        0.5 * ((1.0 + q1) * q2 - (1.0 - q1) * q3)) + 1.0);
                 }
+            }
+
+            return edgeWeights;
+        }
+
+        public static double[][] FullMatrix(string[] input, int index, int dimension)
+        {
+            double[][] edgeWeights = new double[dimension][];
+            for (int i = 0; i < dimension; i++)
+            {
+                edgeWeights[i] = new double[dimension];
+            }
+
+            int row = 0;
+            int col = 0;
+
+            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            {
+                string[] line = System.Text.RegularExpressions.Regex.Replace(
+                    input[index], @"\s+", " ").Trim().Split(' ');
+
+                foreach (string str in line)
+                {
+                    edgeWeights[row][col] = double.Parse(str);
+                    col++;
+                    if (col == dimension)
+                    {
+                        row++;
+                        col = 0;
+                    }
+                }
+                index++;
             }
 
             return edgeWeights;
@@ -476,7 +519,7 @@ namespace TSPAlgorithm
             }
 
             int row = 0;
-            int col = dimension - 1;
+            int col = 0;
 
             while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
             {
@@ -485,16 +528,19 @@ namespace TSPAlgorithm
 
                 foreach (string str in line)
                 {
-                    if (row == col)
+                    if (col == row)
                     {
-                        row++;
-                        col = dimension - 1;
+                        edgeWeights[row][col] = 0;
+                        col++;
                     }
-
                     edgeWeights[row][col] = double.Parse(str);
                     edgeWeights[col][row] = edgeWeights[row][col];
-
-                    col--;
+                    col++;
+                    if (col == dimension)
+                    {
+                        row++;
+                        col = row;
+                    }
                 }
                 index++;
             }
@@ -526,16 +572,17 @@ namespace TSPAlgorithm
 
                 foreach (string str in line)
                 {
-                    if (row == col)
+                    if (col == row)
                     {
+                        edgeWeights[row][col] = 0;
                         row++;
                         col = 0;
                     }
-
                     edgeWeights[row][col] = double.Parse(str);
+
                     edgeWeights[col][row] = edgeWeights[row][col];
 
-                    row++;
+                    col++;
                 }
                 index++;
             }
@@ -570,12 +617,12 @@ namespace TSPAlgorithm
                 {
                     edgeWeights[row][col] = double.Parse(str);
                     edgeWeights[col][row] = edgeWeights[row][col];
+                    col++;
 
-                    col--;
-                    if (str == "0")
+                    if (col == dimension)
                     {
                         row++;
-                        col = dimension - 1;
+                        col = row;
                     }
                 }
                 index++;
@@ -612,11 +659,14 @@ namespace TSPAlgorithm
                     edgeWeights[row][col] = double.Parse(str);
                     edgeWeights[col][row] = edgeWeights[row][col];
 
-                    col++;
-                    if (str == "0")
+                    if (col == row)
                     {
                         row++;
                         col = 0;
+                    }
+                    else
+                    {
+                        col++;
                     }
                 }
                 index++;
@@ -640,8 +690,8 @@ namespace TSPAlgorithm
                 edgeWeights[i] = new double[dimension];
             }
 
-            int row = dimension - 1;
-            int col = dimension - 1;
+            int row = 0;
+            int col = 0;
 
             while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
             {
@@ -652,14 +702,13 @@ namespace TSPAlgorithm
                 {
                     if (row == col)
                     {
-                        row = dimension - 1;
-                        col--;
+                        edgeWeights[row][col] = 0;
+                        col++;
+                        row = 0;
                     }
-
                     edgeWeights[row][col] = double.Parse(str);
                     edgeWeights[col][row] = edgeWeights[row][col];
-
-                    row--;
+                    row++;
                 }
                 index++;
             }
@@ -682,7 +731,7 @@ namespace TSPAlgorithm
                 edgeWeights[i] = new double[dimension];
             }
 
-            int row = dimension - 1;
+            int row = 0;
             int col = 0;
 
             while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
@@ -694,14 +743,17 @@ namespace TSPAlgorithm
                 {
                     if (row == col)
                     {
-                        row = dimension - 1;
-                        col++;
+                        edgeWeights[row][col] = 0;
+                        row++;
                     }
-
                     edgeWeights[row][col] = double.Parse(str);
                     edgeWeights[col][row] = edgeWeights[row][col];
-
-                    row--;
+                    row++;
+                    if (row == dimension)
+                    {
+                        col++;
+                        row = col;
+                    }
                 }
                 index++;
             }
@@ -736,12 +788,11 @@ namespace TSPAlgorithm
                 {
                     edgeWeights[row][col] = double.Parse(str);
                     edgeWeights[col][row] = edgeWeights[row][col];
-
-                    row--;
-                    if (str == "0")
+                    row++;
+                    if (row == col)
                     {
-                        row = dimension - 1;
-                        col--;
+                        col++;
+                        row = 0;
                     }
                 }
                 index++;
@@ -777,12 +828,11 @@ namespace TSPAlgorithm
                 {
                     edgeWeights[row][col] = double.Parse(str);
                     edgeWeights[col][row] = edgeWeights[row][col];
-
-                    row--;
-                    if (str == "0")
+                    row++;
+                    if (row == dimension)
                     {
-                        row = dimension - 1;
                         col++;
+                        row = col;
                     }
                 }
                 index++;
