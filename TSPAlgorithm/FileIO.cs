@@ -14,7 +14,8 @@ namespace TSPAlgorithm
         /// Reads in text from file.
         /// </summary>
         /// <param name="filepath">Filepath from the root directory.</param>
-        /// <returns>Array containing each line from the file provided.</returns>
+        /// <returns>Array containing each line from the file provided.
+        /// </returns>
         public static string[] Read(string filepath)
         {
             return File.ReadAllLines(filepath);
@@ -30,8 +31,14 @@ namespace TSPAlgorithm
             File.WriteAllLines(filepath, lines);
         }
 
+        /// <summary>
+        /// Parse symmetrical TSPLIB problem.
+        /// </summary>
+        /// <param name="problem"></param>
+        /// <returns></returns>
         public static Problem ParseTSPLIB(string problem)
         {
+            // init problem parameters
             string problemName = "";
             string comment = "";
             int dimension = -1;
@@ -39,85 +46,109 @@ namespace TSPAlgorithm
             string edgeWeightFormat = "";
             double[][] edgeWeights = new double[0][];
 
+            // read file
             string[] input = Read(Parameters.FilePath + problem + ".tsp");
+
+            // line count
             int count = 0;
+
+            // parse each line until end of file
             while (input[count].Trim() != "EOF")
             {
                 input[count] = input[count].Trim();
                 string[] split = input[count].Split(' ');
                 switch (split[0])
                 {
+                    // problem name
                     case "NAME":
                     case "NAME:":
                         problemName = split.Last();
                         break;
 
+                    // problem comment
                     case "COMMENT":
                     case "COMMENT:":
                         comment = input[count].Substring(split[0].Length);
                         break;
 
+                    // problem dimension
                     case "DIMENSION":
                     case "DIMENSION:":
                         dimension = int.Parse(split.Last());
                         break;
 
+                    // edge weight type
                     case "EDGE_WEIGHT_TYPE":
                     case "EDGE_WEIGHT_TYPE:":
                         edgeWeightType = split.Last();
                         break;
 
+                    // edge weight format
                     case "EDGE_WEIGHT_FORMAT":
                     case "EDGE_WEIGHT_FORMAT:":
                         edgeWeightFormat = split.Last();
                         break;
 
+                    // coords or edgeweights
                     case "NODE_COORD_SECTION":
                     case "EDGE_WEIGHT_SECTION":
+                        // move index to first coord / edgeweight line
                         count++;
+
                         switch (edgeWeightType)
                         {
+                            // explicit - edge weight matrix provided
                             case "EXPLICIT":
                                 switch (edgeWeightFormat)
                                 {
                                     case "FULL_MATRIX":
-                                        edgeWeights = FullMatrix(input, count, dimension);
+                                        edgeWeights = FullMatrix(input, count, 
+                                            dimension);
                                         break;
 
                                     case "UPPER_ROW":
-                                        edgeWeights = UpperRow(input, count, dimension);
+                                        edgeWeights = UpperRow(input, count, 
+                                            dimension);
                                         break;
 
                                     case "LOWER_ROW":
-                                        edgeWeights = LowerRow(input, count, dimension);
+                                        edgeWeights = LowerRow(input, count, 
+                                            dimension);
                                         break;
 
                                     case "UPPER_DIAG_ROW":
-                                        edgeWeights = UpperDiagRow(input, count, dimension);
+                                        edgeWeights = UpperDiagRow(input, count, 
+                                            dimension);
                                         break;
 
                                     case "LOWER_DIAG_ROW":
-                                        edgeWeights = LowerDiagRow(input, count, dimension);
+                                        edgeWeights = LowerDiagRow(input, count, 
+                                            dimension);
                                         break;
 
                                     case "UPPER_COL":
-                                        edgeWeights = UpperCol(input, count, dimension);
+                                        edgeWeights = UpperCol(input, count, 
+                                            dimension);
                                         break;
 
                                     case "LOWER_COL":
-                                        edgeWeights = LowerCol(input, count, dimension);
+                                        edgeWeights = LowerCol(input, count, 
+                                            dimension);
                                         break;
 
                                     case "UPPER_DIAG_COL":
-                                        edgeWeights = UpperDiagCol(input, count, dimension);
+                                        edgeWeights = UpperDiagCol(input, count, 
+                                            dimension);
                                         break;
 
                                     case "LOWER_DIAG_COL":
-                                        edgeWeights = LowerDiagCol(input, count, dimension);
+                                        edgeWeights = LowerDiagCol(input, count, 
+                                            dimension);
                                         break;
                                 }
                                 break;
 
+                            // node coordinates provided
                             case "EUC_2D":
                                 edgeWeights = Euc2D(input, count, dimension);
                                 break;
@@ -162,7 +193,8 @@ namespace TSPAlgorithm
                 count++;
             }
 
-            return ProblemFactory.FactoryMethod(problemName, comment, dimension, edgeWeightType, edgeWeightFormat, edgeWeights);
+            return ProblemFactory.FactoryMethod(problemName, comment, 
+                dimension, edgeWeightType, edgeWeightFormat, edgeWeights);
         }
 
         /// <summary>
@@ -357,7 +389,8 @@ namespace TSPAlgorithm
         /// <param name="index">Index at which coordinates start.</param>
         /// <param name="dimension">Problem dimension.</param>
         /// <returns>Edge weight matrix.</returns>
-        public static double[][] Man3D(string[] input, int index, int dimension)
+        public static double[][] Man3D(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -365,7 +398,8 @@ namespace TSPAlgorithm
                 edgeWeights[i] = new double[dimension];
             }
 
-            (double, double, double)[] nodes = new (double, double, double)[dimension];
+            (double, double, double)[] nodes = new (double, double, 
+                double)[dimension];
             for (int i = 0; i < dimension; i++)
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
@@ -471,7 +505,8 @@ namespace TSPAlgorithm
             return edgeWeights;
         }
 
-        public static double[][] FullMatrix(string[] input, int index, int dimension)
+        public static double[][] FullMatrix(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -482,7 +517,8 @@ namespace TSPAlgorithm
             int row = 0;
             int col = 0;
 
-            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            while (input[index] != "DISPLAY_DATA_SECTION" || 
+                input[index] != "EOF")
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
                     input[index], @"\s+", " ").Trim().Split(' ');
@@ -504,13 +540,15 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
-        /// Parse TSPLIB matrix input in upper row form into edge weight matrix.
+        /// Parse TSPLIB matrix input in upper row form into edge weight 
+        /// matrix.
         /// </summary>
         /// <param name="input">String stream.</param>
         /// <param name="index">Index at which coordinates start.</param>
         /// <param name="dimension">Problem dimension.</param>
         /// <returns>Edge weight matrix.</returns>
-        public static double[][] UpperRow(string[] input, int index, int dimension)
+        public static double[][] UpperRow(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -521,7 +559,8 @@ namespace TSPAlgorithm
             int row = 0;
             int col = 0;
 
-            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            while (input[index] != "DISPLAY_DATA_SECTION" || 
+                input[index] != "EOF")
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
                     input[index], @"\s+", " ").Trim().Split(' ');
@@ -549,13 +588,15 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
-        /// Parse TSPLIB matrix input in lower row form into edge weight matrix.
+        /// Parse TSPLIB matrix input in lower row form into edge weight 
+        /// matrix.
         /// </summary>
         /// <param name="input">String stream.</param>
         /// <param name="index">Index at which coordinates start.</param>
         /// <param name="dimension">Problem dimension.</param>
         /// <returns>Edge weight matrix.</returns>
-        public static double[][] LowerRow(string[] input, int index, int dimension)
+        public static double[][] LowerRow(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -566,9 +607,11 @@ namespace TSPAlgorithm
             int row = 0;
             int col = 0;
 
-            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            while (input[index] != "DISPLAY_DATA_SECTION" || 
+                input[index] != "EOF")
             {
-                string[] line = System.Text.RegularExpressions.Regex.Replace(input[index], @"\s+", " ").Trim().Split(' ');
+                string[] line = System.Text.RegularExpressions.Regex.Replace(
+                    input[index], @"\s+", " ").Trim().Split(' ');
 
                 foreach (string str in line)
                 {
@@ -591,13 +634,15 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
-        /// Parse TSPLIB matrix input in upper diagonal row form into edge weight matrix.
+        /// Parse TSPLIB matrix input in upper diagonal row form into edge 
+        /// weight matrix.
         /// </summary>
         /// <param name="input">String stream.</param>
         /// <param name="index">Index at which coordinates start.</param>
         /// <param name="dimension">Problem dimension.</param>
         /// <returns>Edge weight matrix.</returns>
-        public static double[][] UpperDiagRow(string[] input, int index, int dimension)
+        public static double[][] UpperDiagRow(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -608,7 +653,8 @@ namespace TSPAlgorithm
             int row = 0;
             int col = dimension - 1;
 
-            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            while (input[index] != "DISPLAY_DATA_SECTION" || 
+                input[index] != "EOF")
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
                     input[index], @"\s+", " ").Trim().Split(' ');
@@ -632,13 +678,15 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
-        /// Parse TSPLIB matrix input in lower diagonal row form into edge weight matrix.
+        /// Parse TSPLIB matrix input in lower diagonal row form into edge 
+        /// weight matrix.
         /// </summary>
         /// <param name="input">String stream.</param>
         /// <param name="index">Index at which coordinates start.</param>
         /// <param name="dimension">Problem dimension.</param>
         /// <returns>Edge weight matrix.</returns>
-        public static double[][] LowerDiagRow(string[] input, int index, int dimension)
+        public static double[][] LowerDiagRow(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -649,7 +697,8 @@ namespace TSPAlgorithm
             int row = 0;
             int col = 0;
 
-            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            while (input[index] != "DISPLAY_DATA_SECTION" || 
+                input[index] != "EOF")
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
                     input[index], @"\s+", " ").Trim().Split(' ');
@@ -676,13 +725,15 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
-        /// Parse TSPLIB matrix input in upper column form into edge weight matrix.
+        /// Parse TSPLIB matrix input in upper column form into edge weight 
+        /// matrix.
         /// </summary>
         /// <param name="input">String stream.</param>
         /// <param name="index">Index at which coordinates start.</param>
         /// <param name="dimension">Problem dimension.</param>
         /// <returns>Edge weight matrix.</returns>
-        public static double[][] UpperCol(string[] input, int index, int dimension)
+        public static double[][] UpperCol(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -693,7 +744,8 @@ namespace TSPAlgorithm
             int row = 0;
             int col = 0;
 
-            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            while (input[index] != "DISPLAY_DATA_SECTION" || 
+                input[index] != "EOF")
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
                     input[index], @"\s+", " ").Trim().Split(' ');
@@ -717,13 +769,15 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
-        /// Parse TSPLIB matrix input in lower column form into edge weight matrix.
+        /// Parse TSPLIB matrix input in lower column form into edge weight 
+        /// matrix.
         /// </summary>
         /// <param name="input">String stream.</param>
         /// <param name="index">Index at which coordinates start.</param>
         /// <param name="dimension">Problem dimension.</param>
         /// <returns>Edge weight matrix.</returns>
-        public static double[][] LowerCol(string[] input, int index, int dimension)
+        public static double[][] LowerCol(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -734,7 +788,8 @@ namespace TSPAlgorithm
             int row = 0;
             int col = 0;
 
-            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            while (input[index] != "DISPLAY_DATA_SECTION" || 
+                input[index] != "EOF")
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
                     input[index], @"\s+", " ").Trim().Split(' ');
@@ -762,13 +817,15 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
-        /// Parse TSPLIB matrix input in upper diagonal column form into edge weight matrix.
+        /// Parse TSPLIB matrix input in upper diagonal column form into edge 
+        /// weight matrix.
         /// </summary>
         /// <param name="input">String stream.</param>
         /// <param name="index">Index at which coordinates start.</param>
         /// <param name="dimension">Problem dimension.</param>
         /// <returns>Edge weight matrix.</returns>
-        public static double[][] UpperDiagCol(string[] input, int index, int dimension)
+        public static double[][] UpperDiagCol(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -779,7 +836,8 @@ namespace TSPAlgorithm
             int row = dimension - 1;
             int col = dimension - 1;
 
-            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            while (input[index] != "DISPLAY_DATA_SECTION" || 
+                input[index] != "EOF")
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
                     input[index], @"\s+", " ").Trim().Split(' ');
@@ -802,13 +860,15 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
-        /// Parse TSPLIB matrix input in lower diagonal column form into edge weight matrix.
+        /// Parse TSPLIB matrix input in lower diagonal column form into edge 
+        /// weight matrix.
         /// </summary>
         /// <param name="input">String stream.</param>
         /// <param name="index">Index at which coordinates start.</param>
         /// <param name="dimension">Problem dimension.</param>
         /// <returns>Edge weight matrix.</returns>
-        public static double[][] LowerDiagCol(string[] input, int index, int dimension)
+        public static double[][] LowerDiagCol(string[] input, int index, 
+            int dimension)
         {
             double[][] edgeWeights = new double[dimension][];
             for (int i = 0; i < dimension; i++)
@@ -819,7 +879,8 @@ namespace TSPAlgorithm
             int row = dimension - 1;
             int col = 0;
 
-            while (input[index] != "DISPLAY_DATA_SECTION" || input[index] != "EOF")
+            while (input[index] != "DISPLAY_DATA_SECTION" || 
+                input[index] != "EOF")
             {
                 string[] line = System.Text.RegularExpressions.Regex.Replace(
                     input[index], @"\s+", " ").Trim().Split(' ');

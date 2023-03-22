@@ -1,14 +1,15 @@
 ﻿/*
  * Author: Ewan Robertson
  * Information required to solve a benchmark travelling salesman problem
- * based on the problems from TSPLIB http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/.
+ * based on the problems from TSPLIB 
+ * http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/.
  */
-
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace TSPAlgorithm
 {
+    /// <summary>
+    /// Problem instance of TSP.
+    /// </summary>
     internal class Problem
     {
         /// <summary>
@@ -16,21 +17,36 @@ namespace TSPAlgorithm
         /// </summary>
         private string _name;
 
+        /// <summary>
+        /// Name of the problem.
+        /// </summary>
         public string Name
         {
             get { return _name; }
         }
 
         /// <summary>
-        /// Comment from file.
+        /// Problem description.
         /// </summary>
         private string _comment;
+
+
+        /// <summary>
+        /// Problem description.
+        /// </summary>
+        public string Comment
+        {
+            get { return _comment; }
+        }
 
         /// <summary>
         /// Number of nodes in the problem.
         /// </summary>
         private int _dimension;
 
+        /// <summary>
+        /// Number of nodes in the problem.
+        /// </summary>
         public int Dimension
         {
             get { return _dimension; }
@@ -41,27 +57,53 @@ namespace TSPAlgorithm
         /// </summary>
         private string _edgeWeightType;
 
+        /// <summary>
+        /// Edge weight type from file.
+        /// </summary>
+        public string EdgeWeightType
+        {
+            get { return _edgeWeightType; }
+        }
+
+        /// <summary>
+        /// Format edge weights are given in.
+        /// </summary>
         private string _edgeWeightFormat;
 
         /// <summary>
-        /// Matrix of distances between nodes.
+        /// Format edge weights are given in.
+        /// </summary>
+        public string EdgeWeightFormat
+        {
+            get { return _edgeWeightFormat; }
+        }
+
+        /// <summary>
+        /// Matrix of edge weights between nodes.
         /// </summary>
         private double[][] _edgeLengths;
 
+        /// <summary>
+        /// Matrix of edge weights between nodes.
+        /// </summary>
         public double[][] EdgeLengths
         {
             get { return _edgeLengths; }
         }
 
         /// <summary>
-        /// Constructor for initialising Problem instances.
+        /// Constructor.
         /// </summary>
         /// <param name="name">Name of the Problem.</param>
         /// <param name="comment">Comment from file.</param>
         /// <param name="dimension">Number of nodes in the problem.</param>
         /// <param name="edgeWeightType">Edge weight type from file.</param>
-        /// <param name="nodes">Node coordinates.</param>
-        public Problem(string name, string comment, int dimension, string edgeWeightType, string edgeWeightFormat, double[][] edgeWeights)
+        /// <param name="edgeWeightFormat">Format edge weights are given in.
+        /// </param>
+        /// <param name="edgeWeights">Edge weight matrix.</param>
+        public Problem(string name, string comment, int dimension, 
+            string edgeWeightType, string edgeWeightFormat, 
+            double[][] edgeWeights)
         {
             _name = name;
             _comment = comment;

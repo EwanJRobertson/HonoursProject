@@ -11,7 +11,8 @@ namespace TSPAlgorithm
         /// <summary>
         /// File path to work space.
         /// </summary>
-        public const string FilePath = "C:\\Users\\nuker\\Documents\\Honours Project\\Problems\\";
+        public const string FilePath = "C:\\Users\\nuker\\Documents\\" +
+            "Honours Project\\Problems\\";
 
         /// <summary>
         /// TSPLIB file name.
@@ -19,7 +20,8 @@ namespace TSPAlgorithm
         public const string ProblemName = "ulysses16.tsp";
 
         /// <summary>
-        /// The number of times the algorithm will be executed on the problem instance.
+        /// The number of times the algorithm will be executed on the problem 
+        /// instance.
         /// </summary>
         public const int NumberOfRuns = 1;
 
@@ -33,6 +35,10 @@ namespace TSPAlgorithm
         /// </summary>
         public static Random random = new Random();
 
+        /// <summary>
+        /// Flag. Whether the best fitness for each generation should be
+        /// written to a file.
+        /// </summary>
         public static bool WriteAllBests = false;
     }
 }

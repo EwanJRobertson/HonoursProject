@@ -34,7 +34,7 @@ namespace TSPAlgorithm
             // ACOParameterTuning();
             // EvaluationBudgetExperiment();
             Problem problem = FileIO.ParseTSPLIB("berlin52");
-            SimulatedAnnealing algorithm = new SimulatedAnnealing("ea", problem);
+            LinKernighan algorithm = new LinKernighan("lk", problem);
             Console.WriteLine(algorithm.Run().BestFitness); 
 
             // END

@@ -7,8 +7,8 @@
 namespace TSPAlgorithm
 {
     /// <summary>
-    /// Abstract class for the implementation of algorithms for solving benchmark TSP 
-    /// problems.
+    /// Abstract class for the implementation of algorithms for solving 
+    /// benchmark TSP problems.
     /// </summary>
     internal abstract class TravellingSalesmanAlgorithm
     {
@@ -31,23 +31,35 @@ namespace TSPAlgorithm
         private Problem _problem;
 
         /// <summary>
-        /// Problem parameter.
+        /// Problem instance the algorithm is initialised to solve.
         /// </summary>
         public Problem Problem
         {
             get { return _problem; }
         }
 
+        /// <summary>
+        /// Permutation with the best fitness that has be found.
+        /// </summary>
         private Permutation _best;
 
+        /// <summary>
+        /// Permutation with the best fitness that has be found.
+        /// </summary>
         protected Permutation Best
         {
             get { return _best; }
             set { _best = value; }
         }
 
+        /// <summary>
+        /// Count of evaluations made by algorithm.
+        /// </summary>
         private int _evaluations;
 
+        /// <summary>
+        /// Count of evaluations made by algorithm.
+        /// </summary>
         protected int Evaluations
         {
             get { return _evaluations; }
@@ -59,7 +71,8 @@ namespace TSPAlgorithm
         /// Base constructor.
         /// </summary>
         /// <param name="name">Name of the object.</param>
-        /// <param name="problem">Problem instance the algorithm is to solve.</param>
+        /// <param name="problem">Problem instance the algorithm is to solve.
+        /// </param>
         protected TravellingSalesmanAlgorithm (string name, Problem problem)
         {
             _name = name;
@@ -76,8 +89,8 @@ namespace TSPAlgorithm
         protected Result Result()
         {
             Console.WriteLine($"Best fitness found: {Best.Fitness}");
-            return ResultFactory.FactoryMethod(Problem.Name, Name, _best.Fitness,
-                _best.Path(), _evaluations);
+            return ResultFactory.FactoryMethod(Problem.Name, Name, 
+                _best.Fitness, _best.Path(), _evaluations);
         }
     }
 }
