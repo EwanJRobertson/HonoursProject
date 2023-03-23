@@ -17,13 +17,13 @@ namespace TSPAlgorithm
         /// <summary>
         /// TSPLIB file name.
         /// </summary>
-        public const string ProblemName = "ulysses16.tsp";
+        public const string ProblemName = "berlin52.tsp";
 
         /// <summary>
         /// The number of times the algorithm will be executed on the problem 
         /// instance.
         /// </summary>
-        public const int NumberOfRuns = 1;
+        public const int NumberOfRuns = 10;
 
         /// <summary>
         /// Maximum number of evaluations (fitness function calls) allowed.

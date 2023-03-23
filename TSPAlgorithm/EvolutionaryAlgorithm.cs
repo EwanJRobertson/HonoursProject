@@ -19,7 +19,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Number of permutations in the population.
         /// </summary>
-        private int _populationSize = 40;
+        private int _populationSize = 100;
 
         public int PopulationSize
         {
@@ -403,8 +403,8 @@ namespace TSPAlgorithm
                 Evaluations++)
             {
                 // selection
-                // p1 = TournamentSelection();
-                // p2 = TournamentSelection();
+                //p1 = TournamentSelection();
+                //p2 = TournamentSelection();
                 p1 = RankedSelection();
                 p2 = RankedSelection();
 

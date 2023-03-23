@@ -68,15 +68,15 @@ namespace TSPAlgorithm
             {
                 _fitness = int.MaxValue;
                 return;
-            }    
+            }
 
             // calculate fitness
             _fitness = 0;
-            for (int i = 0; i < Length - 1; i++)
+            for (int i = 0; i < Length; i++)
             {
-                _fitness += _problem.EdgeLengths[_nodes[i]][_nodes[i + 1]];
+                _fitness += _problem.EdgeLengths[_nodes[i]][_nodes[(i + 1) % 
+                    Problem.Dimension]];
             }
-            _fitness += _problem.EdgeLengths[_nodes[Length - 1]][_nodes[0]];
             _fitness = Math.Round(_fitness);
         }
 

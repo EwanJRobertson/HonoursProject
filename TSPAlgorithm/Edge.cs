@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TSPAlgorithm
 {
-    internal class Edge
+    internal class Edge : Comparer<Edge>
     {
         public int _firstNode;
 
@@ -53,9 +53,14 @@ namespace TSPAlgorithm
             return (this.FirstNode == e2.FirstNode) && (this.SecondNode == e2.SecondNode);
         }
 
+        public override int Compare(Edge? x, Edge? y)
+        {
+            return x!.CompareTo(y!);
+        }
+
         public override string ToString()
         {
-            return FirstNode + "   " + SecondNode;
+            return FirstNode + " " + SecondNode;
         }
     }
 }

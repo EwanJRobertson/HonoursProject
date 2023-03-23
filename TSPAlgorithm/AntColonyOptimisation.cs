@@ -280,7 +280,7 @@ namespace TSPAlgorithm
             Init();
 
             // main loop
-            for (Evaluations = 0; Evaluations < Parameters.EvaluationBudget; 
+            for (Evaluations = 0; Evaluations < Parameters.EvaluationBudget - _populationSize; 
                 Evaluations += _populationSize)
             {
                 // move each ant around a tour
@@ -303,7 +303,7 @@ namespace TSPAlgorithm
 
                 // write best solution to console
                 Console.WriteLine($"{Evaluations} {Best.Fitness}");
-                bests[Evaluations] = Best.Fitness.ToString();
+                bests[Evaluations / _populationSize] = Best.Fitness.ToString();
             }
             if (Parameters.WriteAllBests)
             {

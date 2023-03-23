@@ -1,6 +1,7 @@
 ﻿using System.Dynamic;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Transactions;
 
 namespace TSPAlgorithm
 {
@@ -9,7 +10,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Tour.
         /// </summary>
-        private Permutation tour;
+        private int[] tour;
 
         /// <summary>
         /// Constructor
@@ -19,26 +20,58 @@ namespace TSPAlgorithm
         public LinKernighan (string name, Problem problem) : 
             base (name, problem)
         {
-            tour = new Permutation(problem);
+            tour = new int[0];
+        }
+
+        private double GetFitness()
+        {
+            double sum = 0;
+
+            for (int i = 0; i < Problem.Dimension; i++)
+            {
+                int a = tour[i];
+                int b = tour[(i + 1) % Problem.Dimension];
+                sum += Problem.EdgeLengths[a][b];
+            }
+
+            return sum;
+        }
+
+        private int GetIndex(int value)
+        {
+            int i = 0;
+            foreach (int index in tour)
+            {
+                if (value == index)
+                {
+                    return index;
+                }
+                i++;
+            }
+            return -1;
         }
 
         /// <summary>
         /// Creates a random, valid tour for the problem.
         /// </summary>
         /// <returns>Valid tour.</returns>
-        public Permutation CreateRandomTour()
+        public int[] CreateRandomTour()
         {
-            Permutation tour = new Permutation(Problem);
-            while (tour.Length < Problem.Dimension)
+            int[] array = new int[Problem.Dimension];
+            for (int i = 0; i < Problem.Dimension; i++)
             {
-                int nextNode = Parameters.random.Next(Problem.Dimension);
-                while (tour.Contains(nextNode))
-                {
-                    nextNode = Parameters.random.Next(Problem.Dimension);
-                }
-                tour.Add(nextNode);
+                array[i] = i;
             }
-            return tour;
+
+            for (int i = 0; i < Problem.Dimension; ++i)
+            {
+                int index = Parameters.random.Next(i + 1);
+                int a = array[index];
+                array[index] = array[i];
+                array[i] = a;
+            }
+            
+            return array;
         }
 
         private void Improve()
@@ -83,7 +116,7 @@ namespace TSPAlgorithm
         {
             double minDistance = double.MaxValue;
             int nearestNode = -1;
-            int actualNode = tour.GetNode(index);
+            int actualNode = tour[index];
 
             for (int i = 0; i < Problem.Dimension; ++i)
             {
@@ -92,7 +125,7 @@ namespace TSPAlgorithm
                     double distance = Problem.EdgeLengths[i][actualNode];
                     if (distance < minDistance)
                     {
-                        nearestNode = tour.GetIndex(i);
+                        nearestNode = GetIndex(i);
                         minDistance = distance;
                     }
                 }
@@ -132,7 +165,7 @@ namespace TSPAlgorithm
 
                 // step 4.f
                 Gi += Problem.EdgeLengths[tIndex.ElementAt(tIndex.Count - 2)][newT];
-                if (Gi - Problem.EdgeLengths[newT][t1] > GStar)
+                if ((Gi - Problem.EdgeLengths[newT][t1]) > GStar)
                 {
                     GStar = Gi - Problem.EdgeLengths[newT][t1];
                     k = i;
@@ -145,13 +178,8 @@ namespace TSPAlgorithm
             if (GStar > 0)
             {
                 tIndex.Insert(k + 1, tIndex.ElementAt(1));
-                int[] nodes = GetTPrime(tIndex, k);
-                Permutation newTour = new Permutation(Problem);
-                foreach (int node in nodes)
-                {
-                    newTour.Add(node);
-                }
-                tour = newTour.Clone();
+                this.tour = GetTPrime(tIndex, k);
+                Console.WriteLine(GetFitness());
             }
         }
 
@@ -160,7 +188,7 @@ namespace TSPAlgorithm
             int option1 = GetPreviousIdx(tIndex.ElementAt(tIndex.Count - 1));
             int option2 = GetNextIdx(tIndex.ElementAt(tIndex.Count - 1));
 
-            int[] tour1 = ConstructNewTour(tour.GetAllNodes().ToArray(), tIndex, option2);
+            int[] tour1 = ConstructNewTour(tour, tIndex, option1);
 
             if (IsTour(tour1))
             {
@@ -168,7 +196,7 @@ namespace TSPAlgorithm
             }
             else
             {
-                int[] tour2 = ConstructNewTour(tour.GetAllNodes().ToArray(), tIndex, option2);
+                int[] tour2 = ConstructNewTour(tour, tIndex, option2);
                 if (IsTour(tour2))
                 {
                     return option2;
@@ -201,6 +229,7 @@ namespace TSPAlgorithm
                 for (int i = 0; i < currentEdges.Count; ++i)
                 {
                     Edge m = currentEdges.ElementAt(i);
+                   
                     if (e.Equals(m))
                     {
                         s--;
@@ -227,8 +256,8 @@ namespace TSPAlgorithm
             for (int i = 1; i < changes.Count - 2; i += 2)
             {
                 Edge e = new Edge(
-                    tour.GetAllNodes().ElementAt(changes.ElementAt(i)), 
-                    tour.GetAllNodes().ElementAt(changes.ElementAt(i + 1)));
+                    tour[changes.ElementAt(i)], 
+                    tour[changes.ElementAt(i + 1)]);
                 es.Add(e);
             }           
             return es;
@@ -240,8 +269,8 @@ namespace TSPAlgorithm
             for (int i = 2; i < changes.Count - 1; i += 2)
             {
                 Edge e = new Edge(
-                    tour.GetAllNodes().ElementAt(changes.ElementAt(i)),
-                    tour.GetAllNodes().ElementAt(changes.ElementAt(i + 1)));
+                    tour[changes.ElementAt(i)],
+                    tour[changes.ElementAt(i + 1)]);
                 es.Add(e);
             }
             return es;
@@ -261,16 +290,6 @@ namespace TSPAlgorithm
 
         private int[] CreateTourFromEdges (List<Edge> currentEdges, int s)
         {
-            
-            Console.WriteLine("\n\n\n");
-            int c = 0;
-            foreach (Edge e in currentEdges)
-            {
-                Console.WriteLine(c + "  " + e);
-                c++;
-            }
-            
-
             int[] tour = new int[s];
 
             int i = 0;
@@ -408,14 +427,15 @@ namespace TSPAlgorithm
 
         private bool IsPositiveGain(List<int> tIndex, int ti)
         {
-            int gain = 0;
+            double gain = 0;
             for (int i = 1; i < tIndex.Count - 2; ++i)
             {
                 int t1 = tIndex.ElementAt(i);
                 int t2 = tIndex.ElementAt(i + 1);
                 int t3 = i == tIndex.Count - 3 ? ti : tIndex.ElementAt(i + 2);
 
-                gain += (int)Math.Round(Problem.EdgeLengths[t2][t3] - Problem.EdgeLengths[t1][t2]);
+                //gain += (int)Math.Round(Problem.EdgeLengths[t2][t3] - Problem.EdgeLengths[t1][t2]);
+                gain += Problem.EdgeLengths[t2][t3] - Problem.EdgeLengths[t1][t2];
             }
 
             return gain > 0;
@@ -451,7 +471,7 @@ namespace TSPAlgorithm
         private int[] GetTPrime(List<int> tIndex, int k)
         {
             List<int> al2 = new List<int>(tIndex.GetRange(0, k + 2));
-            return ConstructNewTour(tour.GetAllNodes().ToArray(), al2);
+            return ConstructNewTour(tour, al2);
         }
 
         /// <summary>
@@ -464,18 +484,22 @@ namespace TSPAlgorithm
             tour = CreateRandomTour();
 
             double oldDistance = 0;
-            double newDistance = tour.Fitness;
-
+            double newDistance = GetFitness();
             do
             {
                 oldDistance = newDistance;
                 Improve();
-                newDistance = tour.Fitness;
+                newDistance = GetFitness();
+                //Console.WriteLine(newDistance);
+                Evaluations++;
             } 
             while (newDistance < oldDistance);
 
-            Best = tour.Clone();
-            Evaluations++;
+            Best = new Permutation(Problem);
+            foreach (int node in tour)
+            {
+                Best.Add(node);
+            }
 
             return Result();
         }
