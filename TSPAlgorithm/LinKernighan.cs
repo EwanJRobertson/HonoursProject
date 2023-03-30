@@ -1,14 +1,18 @@
-﻿using System.Dynamic;
-using System.Net.Http.Headers;
-using System.Runtime.CompilerServices;
-using System.Transactions;
+﻿/*
+ * Author: Ewan Robertson
+ * Implementation of Lin-Kernighan Algorithm for solving benchmark Travelling
+ * Salesman Problems (TSP).
+ */
 
 namespace TSPAlgorithm
 {
+    /// <summary>
+    /// Lin-Kernighan
+    /// </summary>
     internal class LinKernighan : TravellingSalesmanAlgorithm
     {
         /// <summary>
-        /// Tour.
+        /// Current tour.
         /// </summary>
         private int[] tour;
 
@@ -23,6 +27,10 @@ namespace TSPAlgorithm
             tour = new int[0];
         }
 
+        /// <summary>
+        /// Fitness Function.
+        /// </summary>
+        /// <returns>Distance around current tour.</returns>
         private double GetFitness()
         {
             double sum = 0;
@@ -37,6 +45,23 @@ namespace TSPAlgorithm
             return sum;
         }
 
+        /// <summary>
+        /// Returns the distance between two nodes in the tour.
+        /// </summary>
+        /// <param name="x">Index of the first node.</param>
+        /// <param name="y">Index of the second node.</param>
+        /// <returns>Distance between two input indices.</returns>
+        private double GetDistance(int x, int y)
+        {
+            return Problem.EdgeLengths[tour[x % Problem.Dimension]]
+                [tour[y % Problem.Dimension]];
+        }
+
+        /// <summary>
+        /// Get the index of a value in the tour.
+        /// </summary>
+        /// <param name="value">Search value.</param>
+        /// <returns>Index of value in tour.</returns>
         private int GetIndex(int value)
         {
             int i = 0;
@@ -52,9 +77,10 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
-        /// Creates a random, valid tour for the problem.
+        /// Creates a random, valid tour for the problem using the drunken
+        /// sailor algorithm.
         /// </summary>
-        /// <returns>Valid tour.</returns>
+        /// <returns>Random, valid tour.</returns>
         public int[] CreateRandomTour()
         {
             int[] array = new int[Problem.Dimension];
@@ -62,7 +88,7 @@ namespace TSPAlgorithm
             {
                 array[i] = i;
             }
-
+            
             for (int i = 0; i < Problem.Dimension; ++i)
             {
                 int index = Parameters.random.Next(i + 1);
@@ -74,7 +100,44 @@ namespace TSPAlgorithm
             return array;
         }
 
-        private void Improve()
+        /// <summary>
+        /// Executes the algorithm on the given problem.
+        /// </summary>
+        /// <returns>Run results.</returns>
+        public override Result Run()
+        {
+            // init new tour
+            tour = CreateRandomTour();
+
+            // init distances
+            double oldDistance = 0;
+            double newDistance = GetFitness();
+
+            // main loop
+            do
+            {
+                oldDistance = newDistance;
+                ImproveAll();
+                newDistance = GetFitness();
+                Evaluations++;
+            }
+            while (newDistance < oldDistance && Evaluations < Parameters.EvaluationBudget);
+
+            // set Best
+            Best = new Permutation(Problem);
+            foreach (int node in tour)
+            {
+                Best.Add(node);
+            }
+
+            Console.WriteLine($"Best fitness found: {GetFitness()}");
+            return Result();
+        }
+
+        /// <summary>
+        /// Improves the tour.
+        /// </summary>
+        private void ImproveAll()
         {
             for (int i = 0; i < Problem.Dimension; ++i)
             {
@@ -82,17 +145,28 @@ namespace TSPAlgorithm
             }
         }
 
-        private void Improve(int x)
+        /// <summary>
+        /// Improves the tour, starting from a particular node.
+        /// </summary>
+        /// <param name="t1">Node to start with.</param>
+        private void Improve(int t1)
         {
-            Improve(x, false);
+            Improve(t1, false);
         }
 
+        /// <summary>
+        /// Improves the tour, starting from a particular node.
+        /// </summary>
+        /// <param name="t1">Node to start with.</param>
+        /// <param name="previous">Flad, is there a previous node in the tour.
+        /// </param>
         private void Improve(int t1, bool previous)
         {
             int t2 = previous ? GetPreviousIdx(t1) : GetNextIdx(t1);
             int t3 = GetNearestNeighbour(t2);
 
-            if (t3 != -1 && Problem.EdgeLengths[t2][t3] < Problem.EdgeLengths[t1][t2])
+            // implements gain criteria
+            if (t3 != -1 && GetDistance(t2, t1) > GetDistance(t3, t2))
             {
                 StartAlgorithm(t1, t2, t3);
             } 
@@ -102,16 +176,33 @@ namespace TSPAlgorithm
             }
         }
 
+        /// <summary>
+        /// Returns the previous index of the tour, typically x-1 unless x=0
+        /// then returns last node.
+        /// </summary>
+        /// <param name="index">Current node.</param>
+        /// <returns>Previous node.</returns>
         private int GetPreviousIdx(int index)
         {
             return index == 0 ? Problem.Dimension - 1: index - 1;
         }
 
+        /// <summary>
+        /// Returns the next index of the tour, typically x-1 unless x=n then
+        /// returns first node.
+        /// </summary>
+        /// <param name="index">Current node.</param>
+        /// <returns>Next node.</returns>
         private int GetNextIdx(int index)
         {
             return (index + 1) % Problem.Dimension;
         }
 
+        /// <summary>
+        /// Returns the nearest neighbour by edge weight.
+        /// </summary>
+        /// <param name="index">Current node.</param>
+        /// <returns>Index of nearest neighbour</returns>
         private int GetNearestNeighbour(int index)
         {
             double minDistance = double.MaxValue;
@@ -122,7 +213,7 @@ namespace TSPAlgorithm
             {
                 if (i != actualNode)
                 {
-                    double distance = Problem.EdgeLengths[i][actualNode];
+                    double distance = GetDistance(i, actualNode);
                     if (distance < minDistance)
                     {
                         nearestNode = GetIndex(i);
@@ -133,16 +224,23 @@ namespace TSPAlgorithm
             return nearestNode;
         }
 
+        /// <summary>
+        /// Step 4. from Lin-Kernighan paper.
+        /// </summary>
+        /// <param name="t1">Index of t1 in the tour.</param>
+        /// <param name="t2">Index of t2 in the tour.</param>
+        /// <param name="t3">Index of t3 in the tour.</param>
         private void StartAlgorithm(int t1, int t2, int t3)
         {
             List<int> tIndex = new List<int>();
 
-            tIndex.Insert(0, -1);
+            tIndex.Insert(0, -1);   // start with index 1 to
+                                    // be consistent with paper
             tIndex.Insert(1, t1);
             tIndex.Insert(2, t2);
             tIndex.Insert(3, t3);
 
-            double initialGain = Problem.EdgeLengths[t2][t1] - Problem.EdgeLengths[t3][t2];
+            double initialGain = GetDistance(t2, t1) - GetDistance(t3, t2);
             double GStar = 0;
             double Gi = initialGain;
             int k = 3;
@@ -164,25 +262,136 @@ namespace TSPAlgorithm
                 }
 
                 // step 4.f
-                Gi += Problem.EdgeLengths[tIndex.ElementAt(tIndex.Count - 2)][newT];
-                if ((Gi - Problem.EdgeLengths[newT][t1]) > GStar)
+                Gi += GetDistance(tIndex.ElementAt(tIndex.Count - 2), newT);
+                if (Gi - GetDistance(newT, t1) > GStar)
                 {
-                    GStar = Gi - Problem.EdgeLengths[newT][t1];
+                    GStar = Gi - GetDistance(newT, t1);
                     k = i;
                 }
-
+                
                 tIndex.Add(tiplus1);
-                Gi -= Problem.EdgeLengths[newT][tiplus1];
+                Gi -= GetDistance(newT, tiplus1);
             }
 
             if (GStar > 0)
             {
                 tIndex.Insert(k + 1, tIndex.ElementAt(1));
-                this.tour = GetTPrime(tIndex, k);
-                Console.WriteLine(GetFitness());
+                tour = GetTPrime(tIndex, k);
             }
         }
 
+        /// <summary>
+        /// Returns closest y that meets criteria for step 4.
+        /// </summary>
+        /// <param name="tIndex">List of all t's.</param>
+        /// <returns>Closest possible y.</returns>
+        private int GetNextPossibleY(List<int> tIndex)
+        {
+            int ti = tIndex.ElementAt(tIndex.Count - 1);
+
+            List<int> ys = new List<int>();
+            for (int i = 0; i < Problem.Dimension; ++i)
+            {
+                if (!IsDisjunctive(tIndex, i, ti))
+                {
+                    continue;
+                }
+
+                if (!IsPositiveGain(tIndex, i))
+                {
+                    continue;
+                }
+                if (!NextXPossible(tIndex, i))
+                {
+                    continue;
+                }
+                ys.Add(i);
+            }
+
+            // get closest y
+            double minDistance = double.MaxValue;
+            int minNode = -1;
+
+            foreach (int i in ys)
+            {
+                if (GetDistance(ti, i) < minDistance)
+                {
+                    minNode = i;
+                    minDistance = GetDistance(ti, i);
+                }
+            }
+
+            return minNode;
+        }
+
+        /// <summary>
+        /// Part e. of point 4.
+        /// </summary>
+        /// <param name="tIndex"></param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        private bool NextXPossible(List<int> tIndex, int i)
+        {
+            return IsConnected(tIndex, i, GetNextIdx(i)) || 
+                IsConnected(tIndex, i, GetPreviousIdx(i));
+        }
+
+        /// <summary>
+        /// Determines whether the current tour has an edge linking x and y.
+        /// </summary>
+        /// <param name="tIndex">All t's.</param>
+        /// <param name="x">Node 1.</param>
+        /// <param name="y">Node 2.</param>
+        /// <returns></returns>
+        private bool IsConnected(List<int> tIndex, int x, int y)
+        {
+            if (x == y)
+            {
+                return false;
+            }
+
+            for (int i = 1; i < tIndex.Count - 1; i += 2)
+            {
+                if (tIndex.ElementAt(i) == x && tIndex.ElementAt(i + 1) == y)
+                {
+                    return false;
+                }
+                else if (tIndex.ElementAt(i) == y && tIndex.ElementAt(i + 1) 
+                    == x)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether ditance gain would be positive.
+        /// </summary>
+        /// <param name="tIndex">All t's.</param>
+        /// <param name="ti"></param>
+        /// <returns>True if gain would be positive.</returns>
+        private bool IsPositiveGain(List<int> tIndex, int ti)
+        {
+            double gain = 0;
+            for (int i = 1; i < tIndex.Count - 2; ++i)
+            {
+                int t1 = tIndex.ElementAt(i);
+                int t2 = tIndex.ElementAt(i + 1);
+                int t3 = i == tIndex.Count - 3 ? ti : tIndex.ElementAt(i + 2);
+
+                gain += GetDistance(t2, t3) - GetDistance(t1, t2);
+            }
+
+            return gain > 0;
+        }
+
+        /// <summary>
+        /// Gets new t with characteristics from step 4.a
+        /// </summary>
+        /// <param name="tIndex">All t's.</param>
+        /// <returns>New t.</returns>
         private int SelectNewT(List<int> tIndex)
         {
             int option1 = GetPreviousIdx(tIndex.ElementAt(tIndex.Count - 1));
@@ -205,7 +414,15 @@ namespace TSPAlgorithm
             return -1;
         }
 
-        private int[] ConstructNewTour(int[] tour2, List<int> tIndex, int newItem)
+        /// <summary>
+        /// Constructs new tour.
+        /// </summary>
+        /// <param name="tour2">New tour.</param>
+        /// <param name="tIndex">All t's.</param>
+        /// <param name="newItem">New item to add to t's.</param>
+        /// <returns>New tour from changes.</returns>
+        private int[] ConstructNewTour(int[] tour2, List<int> tIndex, 
+            int newItem)
         {
             List<int> changes = new List<int>(tIndex);
 
@@ -215,6 +432,12 @@ namespace TSPAlgorithm
             return ConstructNewTour(tour2, changes);
         }
 
+        /// <summary>
+        /// Constructs new tour.
+        /// </summary>
+        /// <param name="tour">Tour.</param>
+        /// <param name="changes">Changes.</param>
+        /// <returns></returns>
         private int[] ConstructNewTour(int[] tour, List<int> changes)
         {
             List<Edge> currentEdges = DeriveEdgesFromTour(tour);
@@ -250,6 +473,11 @@ namespace TSPAlgorithm
             return CreateTourFromEdges(currentEdges, s);
         }
 
+        /// <summary>
+        /// Get list of x's from changes.
+        /// </summary>
+        /// <param name="changes">The changes proposed for the tour.</param>
+        /// <returns>List of edges to be removed.</returns>
         private List<Edge> DeriveX(List<int> changes)
         {
             List<Edge> es = new List<Edge>();
@@ -263,6 +491,11 @@ namespace TSPAlgorithm
             return es;
         }
 
+        /// <summary>
+        /// Get list of y's from changes.
+        /// </summary>
+        /// <param name="changes">The changes proposed for the tour.</param>
+        /// <returns>List of edges to be added.</returns>
         private List<Edge> DeriveY(List<int> changes)
         {
             List<Edge> es = new List<Edge>();
@@ -276,6 +509,11 @@ namespace TSPAlgorithm
             return es;
         }
 
+        /// <summary>
+        /// Converts tour to edge list.
+        /// </summary>
+        /// <param name="tour">Current tour.</param>
+        /// <returns>List of edges in tour.</returns>
         private List<Edge> DeriveEdgesFromTour(int[] tour)
         {
             List<Edge> es = new List<Edge>();
@@ -288,6 +526,12 @@ namespace TSPAlgorithm
             return es;
         }
 
+        /// <summary>
+        /// Converts list of edges into tour.
+        /// </summary>
+        /// <param name="currentEdges">List of edges.</param>
+        /// <param name="s">Problem size.</param>
+        /// <returns>New tour from edges.</returns>
         private int[] CreateTourFromEdges (List<Edge> currentEdges, int s)
         {
             int[] tour = new int[s];
@@ -345,6 +589,23 @@ namespace TSPAlgorithm
             return tour;
         }
 
+        /// <summary>
+        /// Constructs T prime.
+        /// </summary>
+        /// <param name="tIndex">Indices of t's.</param>
+        /// <param name="k">Index.</param>
+        /// <returns></returns>
+        private int[] GetTPrime(List<int> tIndex, int k)
+        {
+            List<int> al2 = new List<int>(tIndex.GetRange(0, k + 2));
+            return ConstructNewTour(tour, al2);
+        }
+
+        /// <summary>
+        /// Determines whether a tour is a valid permutation.
+        /// </summary>
+        /// <param name="tour">Tour.</param>
+        /// <returns>True if tour is valid permutation.</returns>
         private bool IsTour(int[] tour)
         {
             if (tour.Length != Problem.Dimension)
@@ -366,45 +627,13 @@ namespace TSPAlgorithm
             return true;
         }
 
-        private int GetNextPossibleY(List<int> tIndex)
-        {
-            int ti = tIndex.ElementAt(tIndex.Count - 1);
-
-            List<int> ys = new List<int>();
-            for (int i = 0; i < Problem.Dimension; ++i)
-            {
-                if (!IsDisjunctive(tIndex, i, ti))
-                {
-                    continue;
-                }
-
-                if (!IsPositiveGain(tIndex, i))
-                {
-                    continue;
-                }
-                if (!NextXPossible(tIndex, i))
-                {
-                    continue;
-                }
-                ys.Add(i);
-            }
-
-            // get closest y
-            double minDistance = double.MaxValue;
-            int minNode = -1;
-
-            foreach (int i in ys)
-            {
-                if (Problem.EdgeLengths[ti][i] < minDistance)
-                {
-                    minNode = i;
-                    minDistance = Problem.EdgeLengths[ti][i];
-                }
-            }
-
-            return minNode;
-        }
-
+        /// <summary>
+        /// Determines whether edge is on X or Y.
+        /// </summary>
+        /// <param name="tIndex">Indices of nodes in tour.</param>
+        /// <param name="x">Node 1.</param>
+        /// <param name="y">Node 2.</param>
+        /// <returns>True if disjunctive.</returns>
         private bool IsDisjunctive(List<int> tIndex, int x, int y)
         {
             if (x == y)
@@ -423,85 +652,6 @@ namespace TSPAlgorithm
                 }
             }
             return true;
-        }
-
-        private bool IsPositiveGain(List<int> tIndex, int ti)
-        {
-            double gain = 0;
-            for (int i = 1; i < tIndex.Count - 2; ++i)
-            {
-                int t1 = tIndex.ElementAt(i);
-                int t2 = tIndex.ElementAt(i + 1);
-                int t3 = i == tIndex.Count - 3 ? ti : tIndex.ElementAt(i + 2);
-
-                //gain += (int)Math.Round(Problem.EdgeLengths[t2][t3] - Problem.EdgeLengths[t1][t2]);
-                gain += Problem.EdgeLengths[t2][t3] - Problem.EdgeLengths[t1][t2];
-            }
-
-            return gain > 0;
-        }
-
-        private bool NextXPossible(List<int> tIndex, int i)
-        {
-            return IsConnected(tIndex, i, GetNextIdx(i)) || IsConnected(tIndex, i, GetPreviousIdx(i));
-        }
-
-        private bool IsConnected(List<int> tIndex, int x, int y)
-        {
-            if (x == y)
-            {
-                return false;
-            }
-
-            for (int i = 1; i < tIndex.Count - 1; i += 2)
-            {
-                if (tIndex.ElementAt(i) == x && tIndex.ElementAt(i + 1) == y)
-                {
-                    return false;
-                }
-                else if (tIndex.ElementAt(i) == y && tIndex.ElementAt(i + 1) == x)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private int[] GetTPrime(List<int> tIndex, int k)
-        {
-            List<int> al2 = new List<int>(tIndex.GetRange(0, k + 2));
-            return ConstructNewTour(tour, al2);
-        }
-
-        /// <summary>
-        /// Executes the algorithm on the given problem.
-        /// </summary>
-        /// <returns>Run results.</returns>
-        public override Result Run()
-        {
-            // init
-            tour = CreateRandomTour();
-
-            double oldDistance = 0;
-            double newDistance = GetFitness();
-            do
-            {
-                oldDistance = newDistance;
-                Improve();
-                newDistance = GetFitness();
-                //Console.WriteLine(newDistance);
-                Evaluations++;
-            } 
-            while (newDistance < oldDistance);
-
-            Best = new Permutation(Problem);
-            foreach (int node in tour)
-            {
-                Best.Add(node);
-            }
-
-            return Result();
         }
     }
 }

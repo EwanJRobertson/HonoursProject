@@ -15,7 +15,7 @@ namespace TSPAlgorithm
 
             Problem problem = FileIO.ParseTSPLIB("berlin52");
             LinKernighan algorithm = new LinKernighan("lk", problem);
-            Console.WriteLine(algorithm.Run().BestFitness);
+            Console.WriteLine(algorithm.Run());
 
 
             // Run Algorithm
@@ -38,6 +38,8 @@ namespace TSPAlgorithm
 
             //SAInitialTemperatureTuning();
             //SACoolingRateTuning();
+
+            //EvaluationBudgetExperiment();
 
             // END
             Console.WriteLine("Exiting");
@@ -65,7 +67,7 @@ namespace TSPAlgorithm
             {
                 results.Add(algorithm.Run());
             }
-            FileIO.Write(Parameters.FilePath + "EA" + ".csv",
+            FileIO.Write(Parameters.FilePath + "EARankedSelection" + ".csv",
                 Result.ToOutput(results.ToArray()));
         }
 
@@ -122,8 +124,9 @@ namespace TSPAlgorithm
             Problem problem = FileIO.ParseTSPLIB("berlin52");
 
             // crossover rate tuning
-            foreach (int cxRate in new double[] { 0.6, 0.7, 0.8, 0.9, 1.0 })
+            foreach (double cxRate in new double[] { 0.6, 0.7, 0.8, 0.9, 1.0 })
             {
+                Console.WriteLine(cxRate);
                 EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("cxRate" + cxRate, problem);
                 algorithm.CrossoverRate = cxRate;
                 for (int i = 0; i < Parameters.NumberOfRuns; i++)
@@ -141,7 +144,7 @@ namespace TSPAlgorithm
             Problem problem = FileIO.ParseTSPLIB("berlin52");
 
             // mutation rate tuning
-            foreach (int mutRate in new double[] { 0.1, 0.25, 0.5, 0.75, 1.0 })
+            foreach (double mutRate in new double[] { 0.6, 0.7, 0.8, 0.9, 1.0 })
             {
                 EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("mutRate" + mutRate, problem);
                 algorithm.MutationRate = mutRate;
@@ -162,7 +165,7 @@ namespace TSPAlgorithm
             Problem problem = FileIO.ParseTSPLIB("berlin52");
 
             // population size tuning
-            foreach (int popSize in new int[] { 50, 75, 100, 125, 150 })
+            foreach (int popSize in new int[] { 25, 50, 75, 100, 125 })
             {
                 AntColonyOptimisation algorithm = new AntColonyOptimisation("pop" + popSize, problem);
                 algorithm.PopulationSize = popSize;
@@ -181,7 +184,7 @@ namespace TSPAlgorithm
             Problem problem = FileIO.ParseTSPLIB("berlin52");
 
             // mutation rate tuning
-            foreach (int mutRate in new double[] { 0.005, 0.01, 0.02, 0.05, 0.1 })
+            foreach (double mutRate in new double[] { 0.01, 0.05, 0.10, 0.15, 0.20 })
             {
                 AntColonyOptimisation algorithm = new AntColonyOptimisation("mutRate" + mutRate, problem);
                 algorithm.MutationRate = mutRate;
@@ -200,7 +203,7 @@ namespace TSPAlgorithm
             Problem problem = FileIO.ParseTSPLIB("berlin52");
 
             // evaporation factor tuning
-            foreach (int evapFactor in new double[] { 0.1, 0.333, 0.5, 0.666, 0.9 })
+            foreach (double evapFactor in new double[] { 0.1, 0.25, 0.5, 0.75, 0.9 })
             {
                 AntColonyOptimisation algorithm = new AntColonyOptimisation("evapFactor" + evapFactor, problem);
                 algorithm.EvaporationFactor = evapFactor;
@@ -279,7 +282,7 @@ namespace TSPAlgorithm
             Problem problem = FileIO.ParseTSPLIB("berlin52");
 
             // q tuning
-            foreach (int t in new double[] { 500, 1000, 1500, 2000, 2500 })
+            foreach (double t in new double[] { 500, 1000, 1500, 2000, 2500 })
             {
                 SimulatedAnnealing algorithm = new SimulatedAnnealing("initTemp" + t, problem);
                 algorithm.InitialTemperature = t;
@@ -298,9 +301,9 @@ namespace TSPAlgorithm
             Problem problem = FileIO.ParseTSPLIB("berlin52");
 
             // q tuning
-            foreach (int propto in new double[] { 0.01, 0.02, 0.03, 0.04, 0.05 })
+            foreach (double propto in new double[] { 0.05, 0.10, 0.15, 0.20, 0.25 })
             {
-                SimulatedAnnealing algorithm = new SimulatedAnnealing("initTemp" + propto, problem);
+                SimulatedAnnealing algorithm = new SimulatedAnnealing("coolingRate" + propto, problem);
                 algorithm.CoolingRate = propto;
                 for (int i = 0; i < Parameters.NumberOfRuns; i++)
                 {
@@ -315,28 +318,39 @@ namespace TSPAlgorithm
 
         public static void EvaluationBudgetExperiment()
         {
-            Problem problem = FileIO.ParseTSPLIB("berlin52");
+            Problem problem = FileIO.ParseTSPLIB("bier127");
+            List<Result> results = new List<Result>();
 
             // EA
             for (int i = 0; i < Parameters.NumberOfRuns; i++)
             {
                 EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("EAEval", problem);
-                algorithm.Run();
+                results.Add(algorithm.Run());
             }
 
             // ACO
             for (int i = 0; i < Parameters.NumberOfRuns; i++)
             {
                 AntColonyOptimisation algorithm = new AntColonyOptimisation("ACOEval", problem);
-                algorithm.Run();
+                results.Add(algorithm.Run());
             }
 
             // SA
             for (int i = 0; i < Parameters.NumberOfRuns; i++)
             {
                 SimulatedAnnealing algorithm = new SimulatedAnnealing("SAEval", problem);
-                algorithm.Run();
+                results.Add(algorithm.Run());
             }
+
+            // LK
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                LinKernighan algorithm = new LinKernighan("LKEval", problem);
+                results.Add(algorithm.Run());
+            }
+
+            FileIO.Write(Parameters.FilePath + "EvalExperiment" + ".csv",
+                Result.ToOutput(results.ToArray()));
         }
 
 

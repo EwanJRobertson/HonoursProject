@@ -15,7 +15,7 @@ namespace TSPAlgorithm
         /// Population of permutations (ants).
         /// </summary>
         private Permutation[] _population;
-
+            
         /// <summary>
         /// Matrix of pheromones for each edge in the graph.
         /// </summary>
@@ -29,7 +29,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Size of the population.
         /// </summary>
-        private int _populationSize = 100;
+        private int _populationSize = 50;
 
         /// <summary>
         /// Size of the population.
@@ -57,7 +57,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Factor to multiple pheromones by (0.0-1.0).
         /// </summary>
-        private double _evaporationFactor = 0.5;
+        private double _evaporationFactor = 0.25;
 
         /// <summary>
         /// Factor to multiple pheromones by (0.0-1.0).
@@ -86,7 +86,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Distance importance factor.
         /// </summary>
-        private int beta = 8;
+        private int beta = 2;
 
         /// <summary>
         /// Distance importance factor.

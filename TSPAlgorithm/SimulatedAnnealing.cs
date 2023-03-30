@@ -28,7 +28,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Rate at which temperature decreases at each generation.
         /// </summary>
-        private double _coolingRate = 0.25;
+        private double _coolingRate = 0.20;
 
         /// <summary>
         /// Rate at which temperature decreases at each generation.

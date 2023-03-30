@@ -28,7 +28,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Maximum number of evaluations (fitness function calls) allowed.
         /// </summary>
-        public const int EvaluationBudget = 50000;
+        public const int EvaluationBudget = 100000;
 
         /// <summary>
         /// Instance of Random class.

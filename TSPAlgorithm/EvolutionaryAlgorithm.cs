@@ -61,7 +61,7 @@ namespace TSPAlgorithm
         /// Chance for the mutation function to be applied to a child 
         /// permutation (0.0-1.0).
         /// </summary>
-        private double _mutationRate = 0.9;
+        private double _mutationRate = 1.0;
 
         /// <summary>
         /// Chance for the mutation function to be applied to a child 
