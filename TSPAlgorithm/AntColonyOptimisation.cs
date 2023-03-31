@@ -4,6 +4,8 @@
  * Travelling Salesman Problems (TSP).
  */
 
+using System.Text.RegularExpressions;
+
 namespace TSPAlgorithm
 {
     /// <summary>
@@ -194,7 +196,7 @@ namespace TSPAlgorithm
                             double pheromone = Math.Pow(
                                 _pheromones[ant.Last][i], alpha);
                             double distanceValue = Math.Pow(1.0 / 
-                                Problem.EdgeLengths[ant.Last][i], beta);
+                                Problem.EdgeWeights[ant.Last][i], beta);
                             denominator += pheromone * distanceValue;
                         }
                     }
@@ -213,7 +215,7 @@ namespace TSPAlgorithm
                             double numerator = Math.Pow(
                                 _pheromones[ant.Last][i], alpha) *
                                 Math.Pow(1.0 / 
-                                    Problem.EdgeLengths[ant.Last][i], beta);
+                                    Problem.EdgeWeights[ant.Last][i], beta);
 
                             _probabilities[i] = numerator / denominator;
                         }
@@ -296,6 +298,7 @@ namespace TSPAlgorithm
                 if (_population[0].Fitness < Best.Fitness)
                 {
                     Best = _population[0].Clone();
+                    EvalsForBest = Evaluations;
                 }
 
                 // update pheromones
@@ -307,8 +310,9 @@ namespace TSPAlgorithm
             }
             if (Parameters.WriteAllBests)
             {
-                FileIO.Write(Parameters.FilePath + "ACOEvals" + DateTime.Now + 
-                    ".csv", bests);
+                FileIO.Write(Parameters.FilePathOutput + "ACOEvals" + 
+                    Regex.Replace(DateTime.Now.TimeOfDay.ToString(), ":", ".")
+                    + ".csv", bests);
             }
 
             // return result

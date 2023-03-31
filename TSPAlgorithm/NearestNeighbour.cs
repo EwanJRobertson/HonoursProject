@@ -47,8 +47,8 @@ namespace TSPAlgorithm
                 for (int j = 0; j < Problem.Dimension; j++)
                 {
                     if (!Best.Contains(j) && 
-                        Problem.EdgeLengths[Best.Last][j] < 
-                        Problem.EdgeLengths[Best.Last][nearestNeighbourIndex])
+                        Problem.EdgeWeights[Best.Last][j] < 
+                        Problem.EdgeWeights[Best.Last][nearestNeighbourIndex])
                     {
                         nearestNeighbourIndex = j;
                     }

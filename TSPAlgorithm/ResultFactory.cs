@@ -25,13 +25,16 @@ namespace TSPAlgorithm
         /// execution.</param>
         /// <param name="evaluationBudget">Number of evaluations allowed in the
         /// execution.</param>
+        /// <param name="evalsForBest">Number of evaluations taken to fund the
+        /// best solution.</param>
         /// <returns>A problem object containing the details of a benchmark 
         /// travelling salesman problem.</returns>
         public static Result FactoryMethod(string problemName, string algorithmName, 
-            double bestFitness, string bestPath, int evaluationBudget)
+            double bestFitness, string bestPath, int evaluationBudget, 
+            int evalsForBest)
         {
             return new Result(problemName, algorithmName, bestFitness, bestPath, 
-                evaluationBudget);
+                evaluationBudget, evalsForBest);
         }
     }
 }

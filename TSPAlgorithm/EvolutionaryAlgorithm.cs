@@ -4,6 +4,8 @@
  * Salesman Problems (TSP).
  */
 
+using System.Text.RegularExpressions;
+
 namespace TSPAlgorithm
 {
     /// <summary>
@@ -426,6 +428,7 @@ namespace TSPAlgorithm
                 if (Best.Fitness > _population[0].Fitness)
                 {
                     Best = _population[0].Clone();
+                    EvalsForBest = Evaluations;
                 }
 
                 // write best solution to console
@@ -438,8 +441,9 @@ namespace TSPAlgorithm
             // write bests to file if required
             if (Parameters.WriteAllBests)
             {
-                FileIO.Write(Parameters.FilePath + "EAEvals" + DateTime.Now + 
-                    ".csv", bests);
+                FileIO.Write(Parameters.FilePathOutput + "EAEvals" +
+                    Regex.Replace(DateTime.Now.TimeOfDay.ToString(), ":", ".")
+                    + ".csv", bests);
             }
 
             return Result();

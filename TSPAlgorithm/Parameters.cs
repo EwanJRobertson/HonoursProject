@@ -15,6 +15,12 @@ namespace TSPAlgorithm
             "Honours Project\\Problems\\";
 
         /// <summary>
+        /// File path to output.
+        /// </summary>
+        public const string FilePathOutput = "C:\\Users\\nuker\\Documents\\" +
+            "Honours Project\\experiment2\\";
+
+        /// <summary>
         /// TSPLIB file name.
         /// </summary>
         public const string ProblemName = "berlin52.tsp";
@@ -23,12 +29,12 @@ namespace TSPAlgorithm
         /// The number of times the algorithm will be executed on the problem 
         /// instance.
         /// </summary>
-        public const int NumberOfRuns = 10;
+        public const int NumberOfRuns = 1;
 
         /// <summary>
         /// Maximum number of evaluations (fitness function calls) allowed.
         /// </summary>
-        public const int EvaluationBudget = 100000;
+        public const int EvaluationBudget = 400000;
 
         /// <summary>
         /// Instance of Random class.
@@ -39,6 +45,6 @@ namespace TSPAlgorithm
         /// Flag. Whether the best fitness for each generation should be
         /// written to a file.
         /// </summary>
-        public static bool WriteAllBests = false;
+        public static bool WriteAllBests = true;
     }
 }

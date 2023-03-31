@@ -39,9 +39,9 @@ namespace TSPAlgorithm
             {
                 int a = tour[i];
                 int b = tour[(i + 1) % Problem.Dimension];
-                sum += Problem.EdgeLengths[a][b];
+                sum += Problem.EdgeWeights[a][b];
             }
-
+            Evaluations++;
             return sum;
         }
 
@@ -53,7 +53,7 @@ namespace TSPAlgorithm
         /// <returns>Distance between two input indices.</returns>
         private double GetDistance(int x, int y)
         {
-            return Problem.EdgeLengths[tour[x % Problem.Dimension]]
+            return Problem.EdgeWeights[tour[x % Problem.Dimension]]
                 [tour[y % Problem.Dimension]];
         }
 
@@ -119,7 +119,6 @@ namespace TSPAlgorithm
                 oldDistance = newDistance;
                 ImproveAll();
                 newDistance = GetFitness();
-                Evaluations++;
             }
             while (newDistance < oldDistance && Evaluations < Parameters.EvaluationBudget);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 namespace TSPAlgorithm
@@ -12,11 +13,6 @@ namespace TSPAlgorithm
             Console.WriteLine("Author: Ewan Robertson 40451077");
             Console.WriteLine("Framework for the comparison of algorithms for solving " +
                 "benchmark Travelling Salesman Problems.\n");
-
-            Problem problem = FileIO.ParseTSPLIB("berlin52");
-            LinKernighan algorithm = new LinKernighan("lk", problem);
-            Console.WriteLine(algorithm.Run());
-
 
             // Run Algorithm
             //RunNN();
@@ -40,6 +36,9 @@ namespace TSPAlgorithm
             //SACoolingRateTuning();
 
             //EvaluationBudgetExperiment();
+
+            //Experiment1();
+            Experiment2();
 
             // END
             Console.WriteLine("Exiting");
@@ -321,6 +320,13 @@ namespace TSPAlgorithm
             Problem problem = FileIO.ParseTSPLIB("bier127");
             List<Result> results = new List<Result>();
 
+            // NN
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                NearestNeighbour algorithm = new NearestNeighbour("NNEval", problem);
+                results.Add(algorithm.Run());
+            }
+
             // EA
             for (int i = 0; i < Parameters.NumberOfRuns; i++)
             {
@@ -388,7 +394,57 @@ namespace TSPAlgorithm
                 results.Add(algorithm.Run());
             }
 
-            FileIO.Write(Parameters.FilePath + "experiment1.csv", Result.ToOutput(results.ToArray()));
+            // LK
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                LinKernighan algorithm = new LinKernighan("LK", problem);
+                results.Add(algorithm.Run());
+            }
+
+            FileIO.Write(Parameters.FilePathOutput + "experiment1.csv", Result.ToOutput(results.ToArray()));
+        }
+
+        public static void Experiment2()
+        {
+            List<Result> results = new List<Result>();
+            Problem problem = FileIO.ParseTSPLIB("pr1002");
+
+            // NN
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                NearestNeighbour algorithm = new NearestNeighbour("NN", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // EA
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("EA", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // ACO
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // SA
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                SimulatedAnnealing algorithm = new SimulatedAnnealing("SA", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // LK
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                LinKernighan algorithm = new LinKernighan("LK", problem);
+                results.Add(algorithm.Run());
+            }
+
+            FileIO.Write(Parameters.FilePathOutput + "experiment2.csv", Result.ToOutput(results.ToArray()));
         }
     }
 }

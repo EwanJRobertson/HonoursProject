@@ -76,6 +76,19 @@ namespace TSPAlgorithm
         }
 
         /// <summary>
+        /// Number of evaluations until the best result is found.
+        /// </summary>
+        private int _evalsForBest;
+
+        /// <summary>
+        /// Number of evaluations until the best result is found.
+        /// </summary>
+        public int EvalsForBest
+        {
+            get { return _evalsForBest; }
+        }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="problemName">Name of the problem.</param>
@@ -85,14 +98,18 @@ namespace TSPAlgorithm
         /// <param name="bestPath">Best path found.</param>
         /// <param name="evaluationBudget">Number of evaluations allowed in the
         /// execution.</param>
+        /// <param name="evalsForBest">Number of evaluations taken to fund the
+        /// best solution.</param>
         public Result(string problemName, string algorithmName, 
-            double bestFitness, string bestPath, int evaluationBudget)
+            double bestFitness, string bestPath, int evaluationBudget,
+            int evalsForBest)
         {
             _problemName = problemName;
             _algorithmName = algorithmName;
             _bestFitness = bestFitness;
             _bestPath = bestPath;
             _evaluationBudget = evaluationBudget;
+            _evalsForBest = evalsForBest;
         }
 
         /// <summary>
@@ -102,7 +119,7 @@ namespace TSPAlgorithm
         public override string ToString()
         {
             return $"{_problemName},{_algorithmName},{_bestFitness}," +
-                $"\"{_bestPath}\",{_evaluationBudget}";
+                $"\"{_bestPath}\",{_evaluationBudget},{_evalsForBest}";
         }
 
         /// <summary>

@@ -86,7 +86,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Matrix of edge weights between nodes.
         /// </summary>
-        public double[][] EdgeLengths
+        public double[][] EdgeWeights
         {
             get { return _edgeLengths; }
         }

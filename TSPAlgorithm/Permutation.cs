@@ -74,7 +74,7 @@ namespace TSPAlgorithm
             _fitness = 0;
             for (int i = 0; i < Length; i++)
             {
-                _fitness += _problem.EdgeLengths[_nodes[i]][_nodes[(i + 1) % 
+                _fitness += _problem.EdgeWeights[_nodes[i]][_nodes[(i + 1) % 
                     Problem.Dimension]];
             }
             _fitness = Math.Round(_fitness);

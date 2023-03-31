@@ -4,6 +4,8 @@
  * Travelling Salesman Problems (TSP).
  */
 
+using System.Text.RegularExpressions;
+
 namespace TSPAlgorithm
 {
     /// <summary>
@@ -182,6 +184,7 @@ namespace TSPAlgorithm
                 if (localBestCycle.Fitness < Best.Fitness)
                 {
                     Best = localBestCycle.Clone();
+                    EvalsForBest = Evaluations;
                 }
 
                 // reduce temperature
@@ -197,7 +200,9 @@ namespace TSPAlgorithm
             // write bests to file if required
             if (Parameters.WriteAllBests)
             {
-                FileIO.Write(Parameters.FilePath + "SAEvals" + DateTime.Now + ".csv", bests);
+                FileIO.Write(Parameters.FilePathOutput + "SAEvals" +
+                    Regex.Replace(DateTime.Now.TimeOfDay.ToString(), ":", ".") 
+                    + ".csv", bests);
             }
 
             return Result();

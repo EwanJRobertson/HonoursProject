@@ -66,6 +66,20 @@ namespace TSPAlgorithm
             set { _evaluations = value; }
         }
 
+        /// <summary>
+        /// Number of evaluations until the best result is found.
+        /// </summary>
+        private int _evalsForBest;
+
+        /// <summary>
+        /// Number of evaluations until the best result is found.
+        /// </summary>
+        protected int EvalsForBest
+        {
+            get { return _evalsForBest; }
+            set { _evalsForBest = value; }
+        }
+
 
         /// <summary>
         /// Base constructor.
@@ -90,7 +104,7 @@ namespace TSPAlgorithm
         {
             Console.WriteLine($"Best fitness found: {Best.Fitness}");
             return ResultFactory.FactoryMethod(Problem.Name, Name, 
-                _best.Fitness, _best.Path(), _evaluations);
+                _best.Fitness, _best.Path(), _evaluations, _evalsForBest);
         }
     }
 }
