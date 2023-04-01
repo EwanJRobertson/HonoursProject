@@ -107,6 +107,51 @@ namespace TSPAlgorithm
             }
         }
 
+        public void InitNN()
+        {
+            _population = new Permutation[_populationSize];
+            for (int i = 0; i < _populationSize; i++)
+            {
+                _population[i] = new Permutation(Problem);
+                Permutation newP = new Permutation(Problem);
+                newP.Add(Parameters.random.Next(0, Problem.Dimension));
+                while (newP.Length != Problem.Dimension)
+                {
+                    int nextNode = Parameters.random.Next(Problem.Dimension);
+                    if (Parameters.random.NextDouble() < 2 / Problem.Dimension)
+                    {
+                        while (_population[i].Contains(nextNode))
+                        {
+                            nextNode = Parameters.random.Next(Problem.Dimension);
+                        }
+                    }
+                    else
+                    {
+                        // get first index not in permutation
+                        nextNode = 0;
+                        while (newP.Contains(nextNode))
+                        {
+                            nextNode++;
+                        }
+
+                        // get index of nearest neighbour
+                        for (int j = 0; j < Problem.Dimension; j++)
+                        {
+                            if (!newP.Contains(j) &&
+                                Problem.EdgeWeights[newP.Last][j] <
+                                Problem.EdgeWeights[newP.Last][nextNode])
+                            {
+                                nextNode = j;
+                            }
+                        }
+                    }
+                    // add next node to permutation
+                    newP.Add(nextNode);
+                }
+                _population[i] = newP.Clone();
+            }
+        }
+
         /// <summary>
         /// Picks n random members of the population and returns the permutation
         /// with the best fitness.
@@ -394,7 +439,8 @@ namespace TSPAlgorithm
             string[] bests = new string[Parameters.EvaluationBudget];
 
             // initialise population
-            InitPopulation();
+            //InitPopulation();
+            InitNN();
             // initialise best
             Best = _population.OrderBy(x => x.Fitness).First();
 

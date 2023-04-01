@@ -60,13 +60,13 @@ namespace TSPAlgorithm
         public static void RunEA()
         {
             List<Result> results = new List<Result>();
-            Problem problem = FileIO.ParseTSPLIB("berlin52");
+            Problem problem = FileIO.ParseTSPLIB("bier127");
             EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("EA", problem);
             for (int i = 0; i < Parameters.NumberOfRuns; i++)
             {
                 results.Add(algorithm.Run());
             }
-            FileIO.Write(Parameters.FilePath + "EARankedSelection" + ".csv",
+            FileIO.Write(Parameters.FilePathOutput + "EAEvals" + ".csv",
                 Result.ToOutput(results.ToArray()));
         }
 
@@ -407,7 +407,7 @@ namespace TSPAlgorithm
         public static void Experiment2()
         {
             List<Result> results = new List<Result>();
-            Problem problem = FileIO.ParseTSPLIB("pr1002");
+            Problem problem = FileIO.ParseTSPLIB("eil101");
 
             // NN
             for (int i = 0; i < Parameters.NumberOfRuns; i++)

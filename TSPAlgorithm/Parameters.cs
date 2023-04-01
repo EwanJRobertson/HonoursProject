@@ -23,7 +23,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// TSPLIB file name.
         /// </summary>
-        public const string ProblemName = "berlin52.tsp";
+        public const string ProblemName = "bier127.tsp";
 
         /// <summary>
         /// The number of times the algorithm will be executed on the problem 
@@ -34,7 +34,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Maximum number of evaluations (fitness function calls) allowed.
         /// </summary>
-        public const int EvaluationBudget = 400000;
+        public const int EvaluationBudget = 250000;
 
         /// <summary>
         /// Instance of Random class.
