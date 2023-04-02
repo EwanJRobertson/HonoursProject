@@ -28,7 +28,7 @@ namespace TSPAlgorithm
             //ACOPopulationSizeTuning();
             //ACOMutationRateTuning();
             //ACOEvaporationFactorTuning();
-            //ACOBetaTuning();
+            ACOBetaTuning();
             //ACOCTuning();
             //ACOQTuning();
 
@@ -38,7 +38,10 @@ namespace TSPAlgorithm
             //EvaluationBudgetExperiment();
 
             //Experiment1();
-            Experiment2();
+            //Experiment2();
+            //Experiment3();
+            //Experiment4();
+            //Experiment5();
 
             // END
             Console.WriteLine("Exiting");
@@ -73,13 +76,13 @@ namespace TSPAlgorithm
         public static void RunACO()
         {
             List<Result> results = new List<Result>();
-            Problem problem = FileIO.ParseTSPLIB("berlin52");
+            Problem problem = FileIO.ParseTSPLIB("gr666");
             AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
             for (int i = 0; i < Parameters.NumberOfRuns; i++)
             {
                 results.Add(algorithm.Run());
             }
-            FileIO.Write(Parameters.FilePath + "ACO" + ".csv",
+            FileIO.Write(Parameters.FilePathOutput + "ACO" + ".csv",
                 Result.ToOutput(results.ToArray()));
         }
 
@@ -445,6 +448,135 @@ namespace TSPAlgorithm
             }
 
             FileIO.Write(Parameters.FilePathOutput + "experiment2.csv", Result.ToOutput(results.ToArray()));
+        }
+
+        public static void Experiment3()
+        {
+            List<Result> results = new List<Result>();
+            Problem problem = FileIO.ParseTSPLIB("u574");
+
+            // NN
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                NearestNeighbour algorithm = new NearestNeighbour("NN", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // EA
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("EA", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // ACO
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // SA
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                SimulatedAnnealing algorithm = new SimulatedAnnealing("SA", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // LK
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                LinKernighan algorithm = new LinKernighan("LK", problem);
+                results.Add(algorithm.Run());
+            }
+
+            FileIO.Write(Parameters.FilePathOutput + "experiment3.csv", Result.ToOutput(results.ToArray()));
+        }
+
+        public static void Experiment4()
+        {
+            List<Result> results = new List<Result>();
+            Problem problem = FileIO.ParseTSPLIB("pr264");
+
+            // NN
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                NearestNeighbour algorithm = new NearestNeighbour("NN", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // EA
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("EA", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // ACO
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // SA
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                SimulatedAnnealing algorithm = new SimulatedAnnealing("SA", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // LK
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                LinKernighan algorithm = new LinKernighan("LK", problem);
+                results.Add(algorithm.Run());
+            }
+
+            FileIO.Write(Parameters.FilePathOutput + "experiment4.csv", Result.ToOutput(results.ToArray()));
+        }
+
+        public static void Experiment5()
+        {
+            List<Result> results = new List<Result>();
+            Problem problem = FileIO.ParseTSPLIB("gr666");
+
+            // NN
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                NearestNeighbour algorithm = new NearestNeighbour("NN", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // EA
+            for (int i = 0; i < 0; i++)
+            {
+                EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("EA", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // ACO
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // SA
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                SimulatedAnnealing algorithm = new SimulatedAnnealing("SA", problem);
+                results.Add(algorithm.Run());
+            }
+
+            // LK
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                LinKernighan algorithm = new LinKernighan("LK", problem);
+                results.Add(algorithm.Run());
+            }
+
+            FileIO.Write(Parameters.FilePathOutput + "experiment5.csv", Result.ToOutput(results.ToArray()));
         }
     }
 }

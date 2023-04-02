@@ -18,7 +18,7 @@ namespace TSPAlgorithm
         /// File path to output.
         /// </summary>
         public const string FilePathOutput = "C:\\Users\\nuker\\Documents\\" +
-            "Honours Project\\experiment2\\";
+            "Honours Project\\experiment1\\";
 
         /// <summary>
         /// TSPLIB file name.
@@ -29,7 +29,7 @@ namespace TSPAlgorithm
         /// The number of times the algorithm will be executed on the problem 
         /// instance.
         /// </summary>
-        public const int NumberOfRuns = 1;
+        public const int NumberOfRuns = 20;
 
         /// <summary>
         /// Maximum number of evaluations (fitness function calls) allowed.
@@ -45,6 +45,6 @@ namespace TSPAlgorithm
         /// Flag. Whether the best fitness for each generation should be
         /// written to a file.
         /// </summary>
-        public static bool WriteAllBests = true;
+        public static bool WriteAllBests = false;
     }
 }

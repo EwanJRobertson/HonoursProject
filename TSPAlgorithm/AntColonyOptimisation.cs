@@ -88,7 +88,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Distance importance factor.
         /// </summary>
-        private int beta = 2;
+        private int beta = 6;
 
         /// <summary>
         /// Distance importance factor.
@@ -116,7 +116,7 @@ namespace TSPAlgorithm
         /// <summary>
         /// Total number of pheromones left by each ant.
         /// </summary>
-        private int q = 500;
+        private int q = 200;
 
         /// <summary>
         /// Total number of pheromones left by each ant.
