@@ -18,7 +18,7 @@ namespace TSPAlgorithm
         /// File path to output.
         /// </summary>
         public const string FilePathOutput = "C:\\Users\\nuker\\Documents\\" +
-            "Honours Project\\experiment1\\";
+            "Honours Project\\experiment4\\";
 
         /// <summary>
         /// TSPLIB file name.
@@ -45,6 +45,6 @@ namespace TSPAlgorithm
         /// Flag. Whether the best fitness for each generation should be
         /// written to a file.
         /// </summary>
-        public static bool WriteAllBests = false;
+        public static bool WriteAllBests = true;
     }
 }

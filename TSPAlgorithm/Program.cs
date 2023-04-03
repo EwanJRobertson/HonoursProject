@@ -28,7 +28,7 @@ namespace TSPAlgorithm
             //ACOPopulationSizeTuning();
             //ACOMutationRateTuning();
             //ACOEvaporationFactorTuning();
-            ACOBetaTuning();
+            //ACOBetaTuning();
             //ACOCTuning();
             //ACOQTuning();
 
@@ -39,7 +39,7 @@ namespace TSPAlgorithm
 
             //Experiment1();
             //Experiment2();
-            //Experiment3();
+            Experiment3();
             //Experiment4();
             //Experiment5();
 
@@ -76,9 +76,9 @@ namespace TSPAlgorithm
         public static void RunACO()
         {
             List<Result> results = new List<Result>();
-            Problem problem = FileIO.ParseTSPLIB("gr666");
+            Problem problem = FileIO.ParseTSPLIB("pr264");
             AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
-            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            for (int i = 0; i < 1; i++)
             {
                 results.Add(algorithm.Run());
             }
@@ -460,6 +460,7 @@ namespace TSPAlgorithm
             {
                 NearestNeighbour algorithm = new NearestNeighbour("NN", problem);
                 results.Add(algorithm.Run());
+                FileIO.Write(Parameters.FilePathOutput + $"experiment3NN+{i}.csv", Result.ToOutput(results.ToArray()));
             }
 
             // EA
@@ -467,6 +468,7 @@ namespace TSPAlgorithm
             {
                 EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("EA", problem);
                 results.Add(algorithm.Run());
+                FileIO.Write(Parameters.FilePathOutput + $"experiment3EA+{i}.csv", Result.ToOutput(results.ToArray()));
             }
 
             // ACO
@@ -474,6 +476,7 @@ namespace TSPAlgorithm
             {
                 AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
                 results.Add(algorithm.Run());
+                FileIO.Write(Parameters.FilePathOutput + $"experiment3ACO+{i}.csv", Result.ToOutput(results.ToArray()));
             }
 
             // SA
@@ -481,6 +484,7 @@ namespace TSPAlgorithm
             {
                 SimulatedAnnealing algorithm = new SimulatedAnnealing("SA", problem);
                 results.Add(algorithm.Run());
+                FileIO.Write(Parameters.FilePathOutput + $"experiment3SA+{i}.csv", Result.ToOutput(results.ToArray()));
             }
 
             // LK
@@ -488,6 +492,7 @@ namespace TSPAlgorithm
             {
                 LinKernighan algorithm = new LinKernighan("LK", problem);
                 results.Add(algorithm.Run());
+                FileIO.Write(Parameters.FilePathOutput + $"experiment3LK+{i}.csv", Result.ToOutput(results.ToArray()));
             }
 
             FileIO.Write(Parameters.FilePathOutput + "experiment3.csv", Result.ToOutput(results.ToArray()));
@@ -539,7 +544,7 @@ namespace TSPAlgorithm
         public static void Experiment5()
         {
             List<Result> results = new List<Result>();
-            Problem problem = FileIO.ParseTSPLIB("gr666");
+            Problem problem = FileIO.ParseTSPLIB("gr431");
 
             // NN
             for (int i = 0; i < Parameters.NumberOfRuns; i++)

@@ -220,6 +220,7 @@ namespace TSPAlgorithm
                             _probabilities[i] = numerator / denominator;
                         }
                     }
+
                     // move to next city based on probabilities
                     double r = Parameters.random.NextDouble();
                     double total = 0.0;
@@ -232,6 +233,7 @@ namespace TSPAlgorithm
                             break;
                         }
                     }
+
                 }
             }
             return ant;
@@ -247,7 +249,14 @@ namespace TSPAlgorithm
             {
                 for (int j = 0; j < Problem.Dimension; j++)
                 {
-                    _pheromones[i][j] *= _evaporationFactor;
+                    if (_pheromones[i][j] <= 0.1)
+                    {
+                        _pheromones[i][j] = 0.1;
+                    }
+                    else
+                    {
+                        _pheromones[i][j] *= _evaporationFactor;
+                    }
                 }
             }
 
@@ -282,9 +291,10 @@ namespace TSPAlgorithm
             Init();
 
             // main loop
-            for (Evaluations = 0; Evaluations < Parameters.EvaluationBudget - _populationSize; 
+            for (Evaluations = 0; Evaluations < Parameters.EvaluationBudget - 
+                _populationSize; 
                 Evaluations += _populationSize)
-            {
+            {                
                 // move each ant around a tour
                 for (int i = 0; i < _populationSize; i++)
                 {
