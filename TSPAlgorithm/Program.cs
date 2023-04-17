@@ -19,6 +19,7 @@ namespace TSPAlgorithm
             //RunEA();
             //RunACO();
             //RunSA();
+            //RunLK();
 
             // Parameter Tuning
             //EAPopulationSizeTuning();
@@ -39,7 +40,7 @@ namespace TSPAlgorithm
 
             //Experiment1();
             //Experiment2();
-            Experiment3();
+            //Experiment3();
             //Experiment4();
             //Experiment5();
 
@@ -47,6 +48,9 @@ namespace TSPAlgorithm
             Console.WriteLine("Exiting");
         }
 
+        /// <summary>
+        /// Execute the Nearest Neighbour algorithm.
+        /// </summary>
         public static void RunNN()
         {
             List<Result> results = new List<Result>();
@@ -60,32 +64,41 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// Execute the Evolutionary Algorithm.
+        /// </summary>
         public static void RunEA()
         {
             List<Result> results = new List<Result>();
-            Problem problem = FileIO.ParseTSPLIB("bier127");
+            Problem problem = FileIO.ParseTSPLIB("berlin52");
             EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("EA", problem);
             for (int i = 0; i < Parameters.NumberOfRuns; i++)
             {
                 results.Add(algorithm.Run());
             }
-            FileIO.Write(Parameters.FilePathOutput + "EAEvals" + ".csv",
+            FileIO.Write(Parameters.FilePathOutput + "EATournamentSelection" + ".csv",
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// Execute the Ant Colony Optimisation algorithm.
+        /// </summary>
         public static void RunACO()
         {
             List<Result> results = new List<Result>();
-            Problem problem = FileIO.ParseTSPLIB("pr264");
+            Problem problem = FileIO.ParseTSPLIB("berlin52");
             AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
             for (int i = 0; i < 1; i++)
             {
                 results.Add(algorithm.Run());
             }
-            FileIO.Write(Parameters.FilePathOutput + "ACO" + ".csv",
-                Result.ToOutput(results.ToArray()));
+            //FileIO.Write(Parameters.FilePathOutput + "ACO" + ".csv",
+            //    Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// Execute the Simulated Annealing algorithm.
+        /// </summary>
         public static void RunSA()
         {
             List<Result> results = new List<Result>();
@@ -99,8 +112,26 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// Execute the Lin-Kernighan Heuristic algorithm.
+        /// </summary>
+        public static void RunLK()
+        {
+            List<Result> results = new List<Result>();
+            Problem problem = FileIO.ParseTSPLIB("berlin52");
+            LinKernighan algorithm = new LinKernighan("LK", problem);
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            {
+                results.Add(algorithm.Run());
+            }
+            FileIO.Write(Parameters.FilePath + "LK" + ".csv",
+            Result.ToOutput(results.ToArray()));
+        }
 
 
+        /// <summary>
+        /// EA population size tuning experiment.
+        /// </summary>
         public static void EAPopulationSizeTuning()
         {
             List<Result> results = new List<Result>();
@@ -120,6 +151,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// EA crossover rate tuning experiment.
+        /// </summary>
         public static void EACrossoverRateTuning()
         {
             List<Result> results = new List<Result>();
@@ -140,6 +174,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// EA mutation rate experiment.
+        /// </summary>
         public static void EAMutationRateTuning()
         {
             List<Result> results = new List<Result>();
@@ -159,8 +196,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
-
-
+        /// <summary>
+        /// ACO population size tuning experiment.
+        /// </summary>
         public static void ACOPopulationSizeTuning()
         {
             List<Result> results = new List<Result>();
@@ -180,6 +218,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// ACO mutation rate tuning experiment.
+        /// </summary>
         public static void ACOMutationRateTuning()
         {
             List<Result> results = new List<Result>();
@@ -199,6 +240,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// ACO evaporation factor tuning experiment.
+        /// </summary>
         public static void ACOEvaporationFactorTuning()
         {
             List<Result> results = new List<Result>();
@@ -218,6 +262,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// ACO beta tuning experiment.
+        /// </summary>
         public static void ACOBetaTuning()
         {
             List<Result> results = new List<Result>();
@@ -237,6 +284,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// ACO C tuning experiment.
+        /// </summary>
         public static void ACOCTuning()
         {
             List<Result> results = new List<Result>();
@@ -256,6 +306,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// ACO Q tuning experiment.
+        /// </summary>
         public static void ACOQTuning()
         {
             List<Result> results = new List<Result>();
@@ -275,9 +328,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
-
-
-
+        /// <summary>
+        /// SA starting temperature tuning experiment.
+        /// </summary>
         public static void SAInitialTemperatureTuning()
         {
             List<Result> results = new List<Result>();
@@ -297,6 +350,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// SA cooling rate tuning experiment.
+        /// </summary>
         public static void SACoolingRateTuning()
         {
             List<Result> results = new List<Result>();
@@ -317,7 +373,9 @@ namespace TSPAlgorithm
         }
 
 
-
+        /// <summary>
+        /// Evaluation budget experiment.
+        /// </summary>
         public static void EvaluationBudgetExperiment()
         {
             Problem problem = FileIO.ParseTSPLIB("bier127");
@@ -362,8 +420,9 @@ namespace TSPAlgorithm
                 Result.ToOutput(results.ToArray()));
         }
 
-
-
+        /// <summary>
+        /// berlin52 experiment.
+        /// </summary>
         public static void Experiment1()
         {
             List<Result> results = new List<Result>();
@@ -407,6 +466,9 @@ namespace TSPAlgorithm
             FileIO.Write(Parameters.FilePathOutput + "experiment1.csv", Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// eil101 experiment.
+        /// </summary>
         public static void Experiment2()
         {
             List<Result> results = new List<Result>();
@@ -450,6 +512,9 @@ namespace TSPAlgorithm
             FileIO.Write(Parameters.FilePathOutput + "experiment2.csv", Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// pr264 experiment.
+        /// </summary>
         public static void Experiment3()
         {
             List<Result> results = new List<Result>();
@@ -472,7 +537,7 @@ namespace TSPAlgorithm
             }
 
             // ACO
-            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            for (int i = 0; i < 0; i++)
             {
                 AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
                 results.Add(algorithm.Run());
@@ -495,9 +560,12 @@ namespace TSPAlgorithm
                 FileIO.Write(Parameters.FilePathOutput + $"experiment3LK+{i}.csv", Result.ToOutput(results.ToArray()));
             }
 
-            FileIO.Write(Parameters.FilePathOutput + "experiment3.csv", Result.ToOutput(results.ToArray()));
+            FileIO.Write(Parameters.FilePathOutput + "u574 experiment3.csv", Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// gr431 experiment.
+        /// </summary>
         public static void Experiment4()
         {
             List<Result> results = new List<Result>();
@@ -541,6 +609,9 @@ namespace TSPAlgorithm
             FileIO.Write(Parameters.FilePathOutput + "experiment4.csv", Result.ToOutput(results.ToArray()));
         }
 
+        /// <summary>
+        /// u574 experiment.
+        /// </summary>
         public static void Experiment5()
         {
             List<Result> results = new List<Result>();
@@ -554,14 +625,14 @@ namespace TSPAlgorithm
             }
 
             // EA
-            for (int i = 0; i < 0; i++)
+            for (int i = 0; i < Parameters.NumberOfRuns; i++)
             {
                 EvolutionaryAlgorithm algorithm = new EvolutionaryAlgorithm("EA", problem);
                 results.Add(algorithm.Run());
             }
 
             // ACO
-            for (int i = 0; i < Parameters.NumberOfRuns; i++)
+            for (int i = 0; i < 0; i++)
             {
                 AntColonyOptimisation algorithm = new AntColonyOptimisation("ACO", problem);
                 results.Add(algorithm.Run());
@@ -581,7 +652,7 @@ namespace TSPAlgorithm
                 results.Add(algorithm.Run());
             }
 
-            FileIO.Write(Parameters.FilePathOutput + "experiment5.csv", Result.ToOutput(results.ToArray()));
+            FileIO.Write(Parameters.FilePathOutput + "gr431-experiment5.csv", Result.ToOutput(results.ToArray()));
         }
     }
 }

@@ -107,6 +107,9 @@ namespace TSPAlgorithm
             }
         }
 
+        /// <summary>
+        /// Initialise population using the modified Nearest Neighbour algorithm.
+        /// </summary>
         public void InitNN()
         {
             _population = new Permutation[_populationSize];

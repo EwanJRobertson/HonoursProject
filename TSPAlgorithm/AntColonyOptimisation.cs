@@ -4,6 +4,7 @@
  * Travelling Salesman Problems (TSP).
  */
 
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace TSPAlgorithm
