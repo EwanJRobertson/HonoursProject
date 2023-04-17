@@ -4,6 +4,9 @@
  * Travelling Salesman Problems (TSP).
  */
 
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
+
 namespace TSPAlgorithm
 {
     /// <summary>
@@ -15,7 +18,7 @@ namespace TSPAlgorithm
         /// Population of permutations (ants).
         /// </summary>
         private Permutation[] _population;
-
+            
         /// <summary>
         /// Matrix of pheromones for each edge in the graph.
         /// </summary>
@@ -25,48 +28,113 @@ namespace TSPAlgorithm
         /// Probability to move from current node to node numbered index.
         /// </summary>
         private double[] _probabilities;
-        
+
         /// <summary>
         /// Size of the population.
         /// </summary>
-        private readonly int _populationSize = 100;
+        private int _populationSize = 50;
 
         /// <summary>
-        /// Chance for a random move (not affected by pheromones). 0-1.
+        /// Size of the population.
         /// </summary>
-        private readonly double _mutationRate = 0.01;
+        public int PopulationSize
+        {
+            get { return _populationSize; }
+            set { _populationSize = value; }
+        }
 
         /// <summary>
-        /// Factor to multiple pheromones by after entire population has moved. 0-1.
+        /// Chance for a random move (not affected by pheromones) (0.0-1.0).
         /// </summary>
-        private readonly double _evaporationFactor = 0.5;
+        private double _mutationRate = 0.01;
+
+        /// <summary>
+        /// Chance for a random move (not affected by pheromones) (0.0-1.0).
+        /// </summary>
+        public double MutationRate
+        {
+            get { return _mutationRate;}
+            set { _mutationRate = value; }
+        }
+
+        /// <summary>
+        /// Factor to multiple pheromones by (0.0-1.0).
+        /// </summary>
+        private double _evaporationFactor = 0.25;
+
+        /// <summary>
+        /// Factor to multiple pheromones by (0.0-1.0).
+        /// </summary>
+        public double EvaporationFactor
+        {
+            get { return _evaporationFactor; }
+            set { _evaporationFactor = value; }
+        }
 
         /// <summary>
         /// Pheromone importance factor.
         /// </summary>
-        private readonly int alpha = 1;
-        
+        private int alpha = 1;
+
+
+        /// <summary>
+        /// Pheromone importance factor.
+        /// </summary>
+        public int Alpha
+        { 
+            get { return alpha; } 
+            set { alpha = value; } 
+        }
+
         /// <summary>
         /// Distance importance factor.
         /// </summary>
-        private readonly int beta = 8;
+        private int beta = 6;
+
+        /// <summary>
+        /// Distance importance factor.
+        /// </summary>
+        public int Beta
+        {
+            get { return beta; }
+            set { beta = value; }
+        }
 
         /// <summary>
         /// Starting pheromone values.
         /// </summary>
-        private readonly double c = 1.0;
+        private double c = 1.0;
+
+        /// <summary>
+        /// Starting pheromone values.
+        /// </summary>
+        public double C
+        {
+            get { return c; }
+            set { c = value; }
+        }
 
         /// <summary>
         /// Total number of pheromones left by each ant.
         /// </summary>
-        private readonly int q = 500;
+        private int q = 200;
+
+        /// <summary>
+        /// Total number of pheromones left by each ant.
+        /// </summary>
+        public int Q
+        {
+            get { return q; }
+            set { q = value; }
+        }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="name">Algorithm name.</param>
         /// <param name="problem">Problem algorithm to be run on.</param>
-        public AntColonyOptimisation(string name, Problem problem) : base(name, problem)
+        public AntColonyOptimisation(string name, Problem problem) : 
+            base(name, problem)
         {
             _population = new Permutation[_populationSize];
             _probabilities = new double[Problem.Dimension];
@@ -78,6 +146,7 @@ namespace TSPAlgorithm
         /// </summary>
         private void Init()
         {
+            _population = new Permutation[_populationSize];
             _probabilities = new double[Problem.Dimension];
 
             // set all pheromones to initial value c
@@ -125,8 +194,10 @@ namespace TSPAlgorithm
                     {
                         if (!ant.Contains(i))
                         {
-                            double pheromone = Math.Pow(_pheromones[ant.Last][i], alpha);
-                            double distanceValue = Math.Pow(1.0 / Problem.EdgeLengths[ant.Last][i], beta);
+                            double pheromone = Math.Pow(
+                                _pheromones[ant.Last][i], alpha);
+                            double distanceValue = Math.Pow(1.0 / 
+                                Problem.EdgeWeights[ant.Last][i], beta);
                             denominator += pheromone * distanceValue;
                         }
                     }
@@ -134,19 +205,23 @@ namespace TSPAlgorithm
                     // calculate probability for ant to move to each node
                     for (int i = 0; i < Problem.Dimension; i++)
                     {
-                        // if ant has already visited node then probability is zero
+                        // if ant has already visited node then probability is
+                        // zero
                         if (ant.Contains(i))
                         {
                             _probabilities[i] = 0;
                         }
                         else
                         {
-                            double numerator = Math.Pow(_pheromones[ant.Last][i], alpha) *
-                                Math.Pow(1.0 / Problem.EdgeLengths[ant.Last][i], beta);
+                            double numerator = Math.Pow(
+                                _pheromones[ant.Last][i], alpha) *
+                                Math.Pow(1.0 / 
+                                    Problem.EdgeWeights[ant.Last][i], beta);
 
                             _probabilities[i] = numerator / denominator;
                         }
                     }
+
                     // move to next city based on probabilities
                     double r = Parameters.random.NextDouble();
                     double total = 0.0;
@@ -159,6 +234,7 @@ namespace TSPAlgorithm
                             break;
                         }
                     }
+
                 }
             }
             return ant;
@@ -174,7 +250,14 @@ namespace TSPAlgorithm
             {
                 for (int j = 0; j < Problem.Dimension; j++)
                 {
-                    _pheromones[i][j] *= _evaporationFactor;
+                    if (_pheromones[i][j] <= 0.1)
+                    {
+                        _pheromones[i][j] = 0.1;
+                    }
+                    else
+                    {
+                        _pheromones[i][j] *= _evaporationFactor;
+                    }
                 }
             }
 
@@ -184,9 +267,11 @@ namespace TSPAlgorithm
                 double contribution = q / ant.Length;
                 for (int i = 0; i < Problem.Dimension - 1; i++)
                 {
-                    _pheromones[ant.GetNode(i)][ant.GetNode(i + 1)] += contribution;
+                    _pheromones[ant.GetNode(i)][ant.GetNode(i + 1)] += 
+                        contribution;
                 }
-                _pheromones[ant.GetNode(ant.Length - 1)][ant.GetNode(0)] += contribution;
+                _pheromones[ant.GetNode(ant.Length - 1)][ant.GetNode(0)] += 
+                    contribution;
             }
         }
 
@@ -196,6 +281,10 @@ namespace TSPAlgorithm
         /// <returns>Result object containing information on the run.</returns>
         public override Result Run()
         {
+            // print best each generation
+            string[] bests = new string[Parameters.EvaluationBudget / 
+                _populationSize];
+
             // save best result found
             Best = new Permutation(Problem);
 
@@ -203,12 +292,14 @@ namespace TSPAlgorithm
             Init();
 
             // main loop
-            for (int Evaluations = 0; Evaluations < Parameters.EvaluationBudget; Evaluations += _populationSize)
-            {
+            for (Evaluations = 0; Evaluations < Parameters.EvaluationBudget - 
+                _populationSize; 
+                Evaluations += _populationSize)
+            {                
                 // move each ant around a tour
-                for (int j = 0; j < _populationSize; j++)
+                for (int i = 0; i < _populationSize; i++)
                 {
-                    _population[j] = Move();
+                    _population[i] = Move();
                 }
 
                 // order population by fitness
@@ -218,13 +309,21 @@ namespace TSPAlgorithm
                 if (_population[0].Fitness < Best.Fitness)
                 {
                     Best = _population[0].Clone();
+                    EvalsForBest = Evaluations;
                 }
 
                 // update pheromones
                 UpdatePheromones();
 
                 // write best solution to console
-                Console.WriteLine($"{Evaluations + 1} {Best.Fitness}");
+                Console.WriteLine($"{Evaluations} {Best.Fitness}");
+                bests[Evaluations / _populationSize] = Best.Fitness.ToString();
+            }
+            if (Parameters.WriteAllBests)
+            {
+                FileIO.Write(Parameters.FilePathOutput + "ACOEvals" + 
+                    Regex.Replace(DateTime.Now.TimeOfDay.ToString(), ":", ".")
+                    + ".csv", bests);
             }
 
             // return result
